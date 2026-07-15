@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
-const SEED_PASSWORD = process.env.SEED_PASSWORD || "demopassword";
+const SEED_PASSWORD = process.env.SEED_PASSWORD || "demo1234";
 
 // The six real department members (emails as provided).
 const USERS = [
