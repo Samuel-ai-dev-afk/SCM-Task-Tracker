@@ -30,30 +30,50 @@ export function weekRange(n: number): string {
   return `${MON[start.getUTCMonth()]} ${start.getUTCDate()} – ${MON[end.getUTCMonth()]} ${end.getUTCDate()}`;
 }
 
-/** Turnaround in whole days, or null when either date is missing / invalid. */
+// The working week is Monday–Thursday. Friday, Saturday and Sunday don't count
+// toward turnaround or deadline figures.
+// The anchor (1 Jun 2026) is a Monday, so day-of-week is derived from it.
+
+/** Count of working days (Mon–Thu) strictly before `t` since the Monday anchor. */
+function workdayIndex(t: number): number {
+  const dayOffset = Math.floor((t - WEEK1_START) / DAY_MS);
+  const fullWeeks = Math.floor(dayOffset / 7);
+  const rem = dayOffset - fullWeeks * 7; // 0 = Mon … 6 = Sun
+  return fullWeeks * 4 + Math.min(rem, 4); // Mon–Thu (0–3) count; Fri/Sat/Sun (4–6) don't
+}
+
+/**
+ * Number of working days (Mon–Thu) between two dates, signed.
+ * Counts the interval [start, end): same day = 0, one working day later = 1.
+ */
+export function workingDaysBetween(
+  start: string | Date | null | undefined,
+  end: string | Date | null | undefined,
+): number | null {
+  const a = toUtcMidnight(start);
+  const b = toUtcMidnight(end);
+  if (a === null || b === null) return null;
+  return workdayIndex(b) - workdayIndex(a);
+}
+
+/** Turnaround in working days (Mon–Thu), or null when a date is missing / negative. */
 export function turnaround(
   dateAssigned: string | Date | null | undefined,
   dateCompleted: string | Date | null | undefined,
 ): number | null {
-  const a = toUtcMidnight(dateAssigned);
-  const b = toUtcMidnight(dateCompleted);
-  if (a === null || b === null) return null;
-  const d = Math.round((b - a) / DAY_MS);
-  return d < 0 ? null : d;
+  const d = workingDaysBetween(dateAssigned, dateCompleted);
+  return d === null || d < 0 ? null : d;
 }
 
 /**
- * Completion vs deadline, in whole days. Positive = late (finished after the
- * deadline), negative = early, 0 = on time. Null when either date is missing.
+ * Completion vs deadline, in working days (Mon–Thu). Positive = late (finished
+ * after the deadline), negative = early, 0 = on time. Null when a date is missing.
  */
 export function deadlineVariance(
   deadline: string | Date | null | undefined,
   dateCompleted: string | Date | null | undefined,
 ): number | null {
-  const dl = toUtcMidnight(deadline);
-  const done = toUtcMidnight(dateCompleted);
-  if (dl === null || done === null) return null;
-  return Math.round((done - dl) / DAY_MS);
+  return workingDaysBetween(deadline, dateCompleted);
 }
 
 /** Human phrasing for a deadline variance, e.g. "2 days late", "3 days early", "On time". */
