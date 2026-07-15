@@ -3,13 +3,14 @@ import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
-const SEED_PASSWORD = process.env.SEED_PASSWORD || "changeme123";
+const SEED_PASSWORD = process.env.SEED_PASSWORD || "demopassword";
 
-// The five real department members (emails as provided).
+// The six real department members (emails as provided).
 const USERS = [
   { name: "Larissa Smitha Dsilva", email: "ldsilva@aus.edu", role: "manager" as const },
   { name: "Adeel Murtaza", email: "smmurtaza@aus.edu", role: "manager" as const },
   { name: "Samar Mahmoud", email: "smahmoud@aus.edu", role: "manager" as const },
+  { name: "Syed Bukhari", email: "sbukhari@aus.edu", role: "manager" as const },
   { name: "Samuel Kebete", email: "b00101717@aus.edu", role: "staff" as const },
   { name: "Abdalla AlAli", email: "amali@aus.edu", role: "staff" as const },
 ];

@@ -14,7 +14,10 @@ export function Shell({ me, children }: { me: Me; children: React.ReactNode }) {
 
   const nav = [
     { href: "/tasks", label: isManager ? "All tasks" : "My tasks", icon: "▤" },
-    ...(isManager ? [{ href: "/team", label: "Team", icon: "◍" }] : []),
+    ...(isManager ? [
+      { href: "/team", label: "Team", icon: "◍" },
+      { href: "/analytics", label: "Analytics", icon: "📊" }
+    ] : []),
   ];
 
   return (
