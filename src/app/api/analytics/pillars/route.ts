@@ -1,4 +1,4 @@
-import { route } from '@/lib/route';
+import { route } from '@/lib/http';
 import { requireManager } from '@/lib/authz';
 import { prisma } from '@/lib/prisma';
 import { serializeTask } from '@/lib/serialize';
@@ -38,6 +38,5 @@ export async function PUT() {
 
 // DELETE handler (not needed for GET-only endpoints, but required by Next.js route conventions)
 export async function DELETE() {
-  {
   return new Response('Method Not Allowed', { status: 405 });
 }

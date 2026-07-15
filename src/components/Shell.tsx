@@ -16,7 +16,7 @@ export function Shell({ me, children }: { me: Me; children: React.ReactNode }) {
     { href: "/tasks", label: isManager ? "All tasks" : "My tasks", icon: "▤" },
     ...(isManager ? [
       { href: "/team", label: "Team", icon: "◍" },
-      { href: "/analytics", label: "Analytics", icon: "📊" }
+      { href: "/analytics", label: "Analytics", icon: "▦" }
     ] : []),
   ];
 

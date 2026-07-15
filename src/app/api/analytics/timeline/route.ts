@@ -1,55 +1,4 @@
-import { route } from '@/lib/route';
-import { requireManager } from '@/lib/authz';
-import { prisma } from '@/lib/prisma';
-import { serializeTask } from '@/lib/serialize';
-
-// GET /api/analytics/timeline - Task completion trends over time (weekly)
-export async function GET() {
-  return route(async () => {
-    const user = await requireManager();
-
-    // Get tasks grouped by week of assignment and status
-    // This is a simplified approach - in practice you might want to use raw SQL for better performance
-    const tasks = await prisma.task.findMany({
-      where: {
-        ...(user.role !== 'manager' ? { assignedToId: user.id } : {})
-      },
-      select: {
-        status: true,
-        dateAssigned: true
-      }
-    });
-
-    // Group by week (starting from June 1, 2026 as per the app's week system)
-    const WEEK1_START = Date.UTC(2026, 5, 1); // June 1, 2026
-    const DAY_MS = 86_400_000
-    // Convert to
-    \
-    \    \   \  \  \    \   \   \  \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \     \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   """
-
-    let rawText = ""
-
-    # Extract content between triple backticks
-    start_match = re.search(r"```(?:typescript|ts)?\n", raw_text)
-    if not start_match:
-        return raw_text.strip()
-
-    start_pos = start_match.end()
-    end_match = re.search(r"\n```", raw_text[start_pos:])
-    if not end_match:
-        return raw_text[start_pos:].strip()
-
-    end_pos = start_pos + end_match.start()
-    return raw_text[start_pos:end_pos].strip()
-
-
-
-Let me rewrite this properly:
-
-<tool_call>
-<function=Write>
-<parameter=content>
-import { route } from '@/lib/route';
+import { route } from '@/lib/http';
 import { requireManager } from '@/lib/authz';
 import { prisma } from '@/lib/prisma';
 import { serializeTask } from '@/lib/serialize';
@@ -96,13 +45,15 @@ export async function GET() {
     const result = Object.keys(weeklyCounts).map(week => ({
       weekStart: week,
       ...weeklyCounts[week]
-    })).sort((a, b) =>
-      // Sort by week (chronological)
-      new Date(a.weekStart.split('-')[0], parseInt(a.weekStart.split('W')[1]) - 1, 1)
-        .getTime() -
-      new Date(b.weekStart.split('-')[0], parseInt(b.weekStart.split('W')[1]) - 1, 1)
-        .getTime()
-    );
+    })).sort((a, b) => {
+      const [yearA, weekA] = a.weekStart.split('W');
+      const [yearB, weekB] = b.weekStart.split('W');
+
+      const dateA = new Date(parseInt(yearA), parseInt(weekA) - 1, 1);
+      const dateB = new Date(parseInt(yearB), parseInt(weekB) - 1, 1);
+
+      return dateA.getTime() - dateB.getTime();
+    });
 
     return result;
   });

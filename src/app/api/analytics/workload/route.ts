@@ -1,4 +1,4 @@
-import { route } from '@/lib/route';
+import { route } from '@/lib/http';
 import { requireManager } from '@/lib/authz';
 import { prisma } from '@/lib/prisma';
 import { serializeTask } from '@/lib/serialize';
@@ -17,18 +17,27 @@ export async function GET() {
       select: {
         id: true,
         name: true,
-        role: true,
-        _count: {
-          select: {
-            tasks: {
-              where: {
-                status: {
-                  not: 'Completed' // Consider everything except completed as "open"
-                }
-              }
-            }
-          }
+        role: true
+      }
+    });
+
+    // Get open task counts (tasks assigned to user that are not completed)
+    const openTaskCounts = await prisma.task.groupBy({
+      by: ['assignedToId'],
+      _count: true,
+      where: {
+        status: {
+          not: 'Completed'
         }
+        // We'll filter out null assignedToId in the mapping below
+      }
+    });
+
+    // Map the open task counts to users
+    const openTaskCountMap: Record<string, number> = {};
+    openTaskCounts.forEach((item: any) => {
+      if (item.assignedToId) {
+        openTaskCountMap[item.assignedToId] = Number(item._count) || 0;
       }
     });
 
@@ -36,7 +45,7 @@ export async function GET() {
       id: user.id,
       name: user.name,
       role: user.role,
-      openCount: user._count.tasks || 0
+      openCount: openTaskCountMap[user.id] || 0
     }));
   });
 }

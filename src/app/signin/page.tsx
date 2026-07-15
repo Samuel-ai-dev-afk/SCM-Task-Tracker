@@ -4,6 +4,9 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
+// Shown on the login screen while this is a shared demo.
+const DEMO_PASSWORD = process.env.NEXT_PUBLIC_DEMO_PASSWORD || "demo1234";
+
 export default function SignIn() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -81,8 +84,18 @@ export default function SignIn() {
           )}
         </form>
 
-        <div className="mt-3.5 text-[11px] text-faint text-center">
-          Sign in with your AUS email and the password you were given.
+        <div className="mt-4 pt-3 border-t border-line2 text-center">
+          <div className="text-[10px] font-mono uppercase tracking-[0.12em] text-faint">
+            Demo access
+          </div>
+          <div className="text-[12px] text-muted mt-1.5 leading-relaxed">
+            Sign in with any AUS email below · password{" "}
+            <span className="font-mono font-semibold text-ink">{DEMO_PASSWORD}</span>
+          </div>
+          <div className="text-[11px] text-faint mt-1.5">
+            Managers: ldsilva · smmurtaza · smahmoud · sbukhari &nbsp;·&nbsp; Staff: b00101717 · amali
+            <span className="block">(all @aus.edu)</span>
+          </div>
         </div>
       </div>
     </main>
