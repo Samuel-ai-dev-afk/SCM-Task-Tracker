@@ -4,6 +4,9 @@
 
 :root {
   color-scheme: light;
+  /* Everything uses Roboto — alias the old serif/mono slots to the sans var. */
+  --font-serif: var(--font-sans);
+  --font-mono: var(--font-sans);
 }
 
 html,
