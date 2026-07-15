@@ -1,0 +1,80 @@
+// Prisma schema for the SCM Task Tracker.
+//
+// PRODUCTION: PostgreSQL (Neon / Supabase). DATABASE_URL is set in .env locally
+// and in the Vercel dashboard in production.
+// (To run locally on zero-setup SQLite instead, change provider to "sqlite" and
+// set DATABASE_URL="file:./dev.db" — role is a String and dates are plain
+// DateTime, so the schema is valid on both databases.)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  // App runtime uses the pooled connection; schema changes (db push) use the
+  // direct connection. Supabase's Connect dialog gives you both strings.
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  // "manager" | "staff" — validated in the app layer.
+  role         String
+  passwordHash String
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  // Relations
+  tasksAssigned Task[]    @relation("assignedFrom")
+  tasksReceived Task[]    @relation("assignedTo")
+  comments      Comment[]
+
+  @@index([active])
+}
+
+model Task {
+  id              String    @id @default(cuid())
+  title           String
+  description     String    @default("")
+  // Which strategic pillar this task supports. Null = none.
+  strategicPillar String?
+  // Status is validated in the app layer against the canonical list.
+  status          String    @default("Not Started")
+  fileLink        String?
+  dateAssigned    DateTime
+  deadline        DateTime?
+  dateCompleted   DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  assignedFromId String
+  assignedFrom   User   @relation("assignedFrom", fields: [assignedFromId], references: [id])
+
+  assignedToId String
+  assignedTo   User   @relation("assignedTo", fields: [assignedToId], references: [id])
+
+  comments Comment[]
+
+  @@index([assignedToId])
+  @@index([status])
+  @@index([dateAssigned])
+  @@index([deadline])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  body      String
+  createdAt DateTime @default(now())
+
+  taskId String
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id])
+
+  @@index([taskId])
+}

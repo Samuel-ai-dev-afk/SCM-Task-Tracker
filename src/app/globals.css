@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: #f5f6f7;
+  color: #1a1d23;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+/* Visible keyboard focus everywhere. */
+:focus-visible {
+  outline: 2px solid #8b1e2d;
+  outline-offset: 2px;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #8b1e2d;
+  outline-offset: 1px;
+}
+
+::selection {
+  background: #fbedee;
+}
+
+/* Native date pickers, styled to match the mono treatment. */
+input[type="date"] {
+  font-family: var(--font-mono), ui-monospace, monospace;
+}
+
+/* Thin, quiet scrollbars for dense tables. */
+.scroll-quiet {
+  scrollbar-width: thin;
+  scrollbar-color: #cdd4dc transparent;
+}
+.scroll-quiet::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.scroll-quiet::-webkit-scrollbar-thumb {
+  background: #d6dbe1;
+  border-radius: 4px;
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.animate-pop {
+  animation: pop-in 0.16s cubic-bezier(0.4, 0, 0.2, 1);
+}
