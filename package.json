@@ -5,10 +5,10 @@
   "description": "Internal task tracker for the Strategic Communications department at the American University of Sharjah.",
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "build": "rm -rf node_modules/.prisma && prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "prisma generate",
+    "postinstall": "rm -rf node_modules/.prisma && prisma generate",
     "db:push": "prisma db push",
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio"
