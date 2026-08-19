@@ -5,12 +5,14 @@ import { serializeUser } from "@/lib/serialize";
 import { createUserSchema } from "@/lib/validation";
 import bcrypt from "bcryptjs";
 
-// GET /api/users — managers only. Returns active users with open-task counts.
+// GET /api/users — managers only. Returns active, approved users with
+// open-task counts. Pending signups live at /api/users/pending instead, so they
+// never show up as assignable people.
 export async function GET() {
   return route(async () => {
     await requireManager();
     const users = await prisma.user.findMany({
-      where: { active: true },
+      where: { active: true, approved: true },
       orderBy: [{ role: "asc" }, { name: "asc" }],
     });
 
@@ -36,11 +38,18 @@ export async function POST(req: Request) {
 
     const passwordHash = await bcrypt.hash(input.password, 10);
 
-    // Reactivate a previously removed account if the email matches.
+    // Reactivate a previously removed (or still-pending) account if the email
+    // matches. A manager adding someone by hand is itself the approval.
     const user = existing
       ? await prisma.user.update({
           where: { email: input.email },
-          data: { name: input.name, role: input.role, active: true, passwordHash },
+          data: {
+            name: input.name,
+            role: input.role,
+            active: true,
+            approved: true,
+            passwordHash,
+          },
         })
       : await prisma.user.create({
           data: {
@@ -49,6 +58,7 @@ export async function POST(req: Request) {
             role: input.role,
             passwordHash,
             active: true,
+            approved: true,
           },
         });
 

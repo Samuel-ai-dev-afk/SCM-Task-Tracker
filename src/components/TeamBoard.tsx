@@ -7,14 +7,17 @@ import type { UserDTO } from "@/types";
 
 export function TeamBoard({ meId }: { meId: string }) {
   const [users, setUsers] = useState<UserDTO[]>([]);
+  const [pending, setPending] = useState<UserDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [adding, setAdding] = useState(false);
+  const [deciding, setDeciding] = useState<string | null>(null);
 
   const reload = useCallback(async () => {
     try {
-      const u = await api.get("/api/users");
+      const [u, p] = await Promise.all([api.get("/api/users"), api.get("/api/users/pending")]);
       setUsers(u);
+      setPending(p);
       setError("");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not load the team.");
@@ -48,6 +51,20 @@ export function TeamBoard({ meId }: { meId: string }) {
     }
   }
 
+  // Approve or decline a staff member who signed themselves up.
+  async function decide(u: UserDTO, action: "approve" | "decline") {
+    if (action === "decline" && !confirm(`Decline ${u.name}'s request to join?`)) return;
+    setDeciding(u.id);
+    try {
+      await api.patch(`/api/users/${u.id}`, { action });
+      await reload();
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Could not update that request.");
+    } finally {
+      setDeciding(null);
+    }
+  }
+
   return (
     <>
       <div className="px-6 pt-5">
@@ -68,6 +85,51 @@ export function TeamBoard({ meId }: { meId: string }) {
       </div>
 
       <div className="flex-1 md:overflow-auto scroll-quiet px-6 pb-6">
+        {pending.length > 0 && (
+          <div className="bg-card border border-[#E9C4C0] rounded-[10px] overflow-hidden shadow-card mb-4">
+            <div className="px-3.5 py-2.5 bg-[#FBE6E5] border-b border-[#E9C4C0] flex items-center gap-2">
+              <span className="font-mono text-[9.5px] font-semibold tracking-[0.1em] uppercase text-[#A5372E]">
+                Awaiting approval
+              </span>
+              <span className="font-mono text-[10px] font-semibold text-white bg-[#A5372E] rounded-full px-1.5 py-0.5">
+                {pending.length}
+              </span>
+            </div>
+            {pending.map((u) => (
+              <div
+                key={u.id}
+                className="flex items-center gap-2.5 px-3.5 py-3 border-b border-line2 last:border-0"
+              >
+                <Avatar name={u.name} size={30} />
+                <div className="flex-1 min-w-0">
+                  <div className="font-semibold text-[13.5px] text-ink truncate">{u.name}</div>
+                  <div className="text-[11.5px] text-muted truncate">
+                    {u.email} · signed up {new Date(u.createdAt).toLocaleDateString()}
+                  </div>
+                </div>
+                <button
+                  onClick={() => decide(u, "approve")}
+                  disabled={deciding === u.id}
+                  className="font-semibold text-[12px] text-white bg-burgundy-600 hover:bg-burgundy-700 rounded-md px-2.5 py-1.5 disabled:opacity-60"
+                >
+                  Approve
+                </button>
+                <button
+                  onClick={() => decide(u, "decline")}
+                  disabled={deciding === u.id}
+                  className="font-semibold text-[12px] text-muted border border-line rounded-md px-2.5 py-1.5 hover:bg-line2 disabled:opacity-60"
+                >
+                  Decline
+                </button>
+              </div>
+            ))}
+            <div className="px-3.5 py-2 bg-[#FAFBFC] border-t border-line2 text-[11px] text-faint">
+              These people signed up themselves. Approving lets them sign in and receive tasks —
+              always as staff.
+            </div>
+          </div>
+        )}
+
         <div className="bg-card border border-line rounded-[10px] overflow-hidden shadow-card">
           <table className="w-full border-collapse">
             <thead>
@@ -172,8 +234,9 @@ export function TeamBoard({ meId }: { meId: string }) {
           </table>
         </div>
         <div className="text-[11px] text-faint pt-3">
-          Adding someone lets them sign in and start receiving tasks. Removing a staff member
-          deactivates them — their tasks stay on the board.
+          Adding someone lets them sign in and start receiving tasks. Staff can also sign up
+          themselves with an @aus.edu email — those requests appear above for approval. Removing a
+          staff member deactivates them — their tasks stay on the board.
         </div>
       </div>
 
