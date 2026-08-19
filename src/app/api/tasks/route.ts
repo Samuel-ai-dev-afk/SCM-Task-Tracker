@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { requireUser, requireManager, HttpError } from "@/lib/authz";
+import { requireUser, isManager, HttpError } from "@/lib/authz";
 import { route } from "@/lib/http";
 import { serializeTask } from "@/lib/serialize";
 import { createTaskSchema } from "@/lib/validation";
@@ -24,14 +24,22 @@ export async function GET() {
   });
 }
 
-// POST /api/tasks — managers only.
+/**
+ * POST /api/tasks — managers assign work to anyone; staff may add work they've
+ * done themselves.
+ *
+ * A staff member's task is always assigned to and from themselves, whatever the
+ * request body says — so this can't be used to put work on someone else's board.
+ */
 export async function POST(req: Request) {
   return route(async () => {
-    const user = await requireManager();
+    const user = await requireUser();
     const input = createTaskSchema.parse(await req.json());
 
+    const assignedToId = isManager(user) ? input.assignedToId : user.id;
+
     const assignee = await prisma.user.findFirst({
-      where: { id: input.assignedToId, active: true },
+      where: { id: assignedToId, active: true },
     });
     if (!assignee) throw new HttpError(400, "That person isn't on the tracker.");
 
@@ -45,9 +53,11 @@ export async function POST(req: Request) {
         dateAssigned: new Date(input.dateAssigned + "T00:00:00Z"),
         deadline: input.deadline ? new Date(input.deadline + "T00:00:00Z") : null,
         dateCompleted: input.dateCompleted ? new Date(input.dateCompleted + "T00:00:00Z") : null,
-        assignedToId: input.assignedToId,
-        // Assigner is always the acting manager unless explicitly overridden.
-        assignedFromId: input.assignedFromId ?? user.id,
+        minutesSpent: input.minutesSpent ?? null,
+        assignedToId,
+        // Managers may credit another manager as the assigner; staff logging
+        // their own work are always both sides of it.
+        assignedFromId: isManager(user) ? input.assignedFromId ?? user.id : user.id,
       },
       include: taskInclude,
     });

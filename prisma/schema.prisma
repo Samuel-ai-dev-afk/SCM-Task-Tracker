@@ -49,6 +49,9 @@ model Task {
   // Status is validated in the app layer against the canonical list.
   status          String    @default("Not Started")
   fileLink        String?
+  // Time the assignee logged against this task, in whole minutes. Null = not
+  // recorded yet. Stored as minutes so hour/minute maths stays exact.
+  minutesSpent    Int?
   dateAssigned    DateTime
   deadline        DateTime?
   dateCompleted   DateTime?
@@ -67,6 +70,7 @@ model Task {
   @@index([status])
   @@index([dateAssigned])
   @@index([deadline])
+  @@index([dateCompleted])
 }
 
 model Comment {

@@ -1,46 +1,37 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-export const THEME_KEY = "scm.theme";
+import { applyChoice, readChoice, resolve } from "@/lib/theme";
 
 /**
- * Light/dark switch. The initial class is set by the inline script in the root
- * layout before first paint, so this only has to read what's already applied —
- * that's what stops the page flashing the wrong theme on load.
+ * Quick light/dark switch for the sidebar. The three-way choice (including
+ * "system") lives on the Settings page; this just flips between the two.
+ *
+ * The initial class is set by the inline script in the root layout before first
+ * paint, so this only reads what's already applied — that's what stops the page
+ * flashing the wrong theme on load.
  */
 export function ThemeToggle({ className = "" }: { className?: string }) {
   const [dark, setDark] = useState(false);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    setDark(document.documentElement.classList.contains("dark"));
+    setDark(resolve(readChoice()));
     setReady(true);
   }, []);
 
   function toggle() {
     const next = !dark;
-    document.documentElement.classList.toggle("dark", next);
-    try {
-      localStorage.setItem(THEME_KEY, next ? "dark" : "light");
-    } catch {
-      // Storage blocked (private mode) — the choice just won't persist.
-    }
+    applyChoice(next ? "dark" : "light");
     setDark(next);
   }
 
   const label = dark ? "Switch to light mode" : "Switch to dark mode";
 
   return (
-    <button
-      onClick={toggle}
-      title={label}
-      aria-label={label}
-      // Render the icon only once mounted, so server and client markup match.
-      className={className}
-    >
-      {ready && (dark ? <SunIcon /> : <MoonIcon />)}
-      {!ready && <span className="block w-[15px] h-[15px]" />}
+    <button onClick={toggle} title={label} aria-label={label} className={className}>
+      {/* Rendered only after mount so server and client markup match. */}
+      {ready ? dark ? <SunIcon /> : <MoonIcon /> : <span className="block w-[15px] h-[15px]" />}
     </button>
   );
 }

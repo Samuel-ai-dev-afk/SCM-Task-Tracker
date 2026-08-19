@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { api } from "@/lib/client";
+import { joinMinutes, splitMinutes, formatMinutes } from "@/lib/time";
 import { STATUSES, PILLARS, type Role, type Status } from "@/lib/constants";
 import { weekNumber, weekRange, deadlineVariance, varianceLabel, commentDate } from "@/lib/dates";
 import { Avatar } from "@/components/ui";
@@ -20,6 +21,9 @@ type Form = {
   dateCompleted: string;
   status: Status;
   fileLink: string;
+  // Time logged, kept as two strings while being typed.
+  hours: string;
+  minutes: string;
 };
 
 const today = () => new Date().toISOString().slice(0, 10);
@@ -56,6 +60,8 @@ export function TaskModal({
     dateCompleted: task?.dateCompleted ?? "",
     status: task?.status ?? "Not Started",
     fileLink: task?.fileLink ?? "",
+    hours: splitMinutes(task?.minutesSpent).h,
+    minutes: splitMinutes(task?.minutesSpent).m,
   }));
   const [comments, setComments] = useState<CommentDTO[]>(task?.comments ?? []);
   const [newComment, setNewComment] = useState("");
@@ -80,6 +86,8 @@ export function TaskModal({
         dateAssigned: full.dateAssigned,
         deadline: full.deadline ?? "",
         dateCompleted: full.dateCompleted ?? "",
+        hours: splitMinutes(full.minutesSpent).h,
+        minutes: splitMinutes(full.minutesSpent).m,
         status: full.status,
         fileLink: full.fileLink ?? "",
       }));
@@ -122,6 +130,7 @@ export function TaskModal({
           dateAssigned: form.dateAssigned,
           deadline: form.deadline || null,
           dateCompleted: form.dateCompleted || null,
+          minutesSpent: joinMinutes(form.hours, form.minutes),
           fileLink: form.fileLink.trim() || "",
         });
       } else if (task) {
@@ -136,11 +145,13 @@ export function TaskModal({
               dateAssigned: form.dateAssigned,
               deadline: form.deadline || null,
               dateCompleted: form.dateCompleted || null,
+              minutesSpent: joinMinutes(form.hours, form.minutes),
               fileLink: form.fileLink.trim() || "",
             }
           : {
               status: form.status,
               dateCompleted: form.dateCompleted || null,
+              minutesSpent: joinMinutes(form.hours, form.minutes),
               fileLink: form.fileLink.trim() || "",
             };
         await api.patch(`/api/tasks/${task.id}`, payload);
@@ -309,6 +320,47 @@ export function TaskModal({
                 <ReadOnly mono>{form.deadline || <span className="text-faint">Not set</span>}</ReadOnly>
               )}
             </Field>
+          </div>
+
+          {/* Time logged — the figure the Hours report totals up. */}
+          <div className="mb-3 bg-subtle border border-line2 rounded-lg px-3.5 py-3">
+            <span className="block font-mono text-[9.5px] tracking-[0.1em] uppercase text-faint mb-2">
+              Time spent on this task
+            </span>
+            <div className="flex items-end gap-2.5">
+              <div className="w-[88px]">
+                <input
+                  type="number" min={0} inputMode="numeric" placeholder="0"
+                  value={form.hours}
+                  onChange={(e) => set("hours", e.target.value)}
+                  className="w-full text-center font-mono text-[15px] font-semibold bg-field border border-line rounded-md px-2 py-2"
+                />
+                <div className="text-[10.5px] text-faint text-center mt-1">Hours</div>
+              </div>
+              <div className="text-[17px] text-faint pb-6">:</div>
+              <div className="w-[88px]">
+                <input
+                  type="number" min={0} max={59} inputMode="numeric" placeholder="0"
+                  value={form.minutes}
+                  onChange={(e) => set("minutes", e.target.value)}
+                  className="w-full text-center font-mono text-[15px] font-semibold bg-field border border-line rounded-md px-2 py-2"
+                />
+                <div className="text-[10.5px] text-faint text-center mt-1">Minutes</div>
+              </div>
+              <div className="flex-1 pb-6 text-[11.5px] text-muted leading-relaxed">
+                {form.hours || form.minutes ? (
+                  <>
+                    Logged as{" "}
+                    <span className="font-mono font-semibold text-ink">
+                      {formatMinutes(safeMinutes(form.hours, form.minutes))}
+                    </span>
+                    . Counts toward the period this task is completed in.
+                  </>
+                ) : (
+                  <>Leave blank if you haven&apos;t tracked it. You can add it later.</>
+                )}
+              </div>
+            </div>
           </div>
 
           <div className="flex gap-2.5">
@@ -482,4 +534,13 @@ function ReadOnly({ children, mono = false }: { children: React.ReactNode; mono?
       {children}
     </div>
   );
+}
+
+/** Preview-only: never throws while the user is mid-keystroke. */
+function safeMinutes(h: string, m: string): number {
+  try {
+    return joinMinutes(h, m) ?? 0;
+  } catch {
+    return 0;
+  }
 }

@@ -62,6 +62,7 @@ export async function PATCH(req: Request, { params }: Params) {
         data.dateCompleted = input.dateCompleted
           ? new Date(input.dateCompleted + "T00:00:00Z")
           : null;
+      if (input.minutesSpent !== undefined) data.minutesSpent = input.minutesSpent;
       if (input.fileLink !== undefined) data.fileLink = input.fileLink ? input.fileLink : null;
       if (input.assignedToId !== undefined) {
         const assignee = await prisma.user.findFirst({
@@ -73,13 +74,14 @@ export async function PATCH(req: Request, { params }: Params) {
       if (input.assignedFromId !== undefined)
         data.assignedFrom = { connect: { id: input.assignedFromId } };
     } else {
-      // Staff: only these three fields, and only on their own task.
+      // Staff: only these fields, and only on their own task.
       const input = staffPatchSchema.parse(raw);
       if (input.status !== undefined) data.status = input.status;
       if (input.dateCompleted !== undefined)
         data.dateCompleted = input.dateCompleted
           ? new Date(input.dateCompleted + "T00:00:00Z")
           : null;
+      if (input.minutesSpent !== undefined) data.minutesSpent = input.minutesSpent;
       if (input.fileLink !== undefined) data.fileLink = input.fileLink ? input.fileLink : null;
     }
 
