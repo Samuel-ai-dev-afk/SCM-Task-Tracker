@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { api } from "@/lib/client";
 import { isAusEmail } from "@/lib/validation";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function SignUp() {
   const [name, setName] = useState("");
@@ -43,6 +44,7 @@ export default function SignUp() {
     <main className="relative min-h-screen grid place-items-center px-5 py-10 bg-[#0A0F1E] bg-[url('/campus.jpg')] bg-cover bg-center bg-no-repeat">
       {/* Same treatment as the sign-in page so the two feel like one screen. */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#0A0F1E]/30 via-[#0A0F1E]/15 to-[#0A0F1E]/50" />
+      <ThemeToggle className="absolute top-4 right-4 z-10 text-white/70 hover:text-white hover:bg-white/10 rounded-md p-2 leading-none" />
 
       <div className="relative w-full max-w-[340px] bg-card border border-white/15 rounded-xl shadow-[0_24px_60px_-12px_rgba(0,0,0,.65)] p-7">
         <div className="font-serif font-bold text-[21px] leading-tight text-ink">
@@ -54,7 +56,7 @@ export default function SignUp() {
 
         {done ? (
           <>
-            <div className="px-3 py-3 rounded-md bg-[#E3F1E7] text-[#2C6B42] text-[12.5px] leading-relaxed">
+            <div className="px-3 py-3 rounded-md bg-ok-bg text-ok-fg text-[12.5px] leading-relaxed">
               <span className="font-semibold block mb-0.5">Request sent</span>
               Your account is waiting for a manager to approve it. You&apos;ll be able to sign in
               with <span className="font-mono">{email.trim().toLowerCase()}</span> once they do.
@@ -82,7 +84,7 @@ export default function SignUp() {
                 placeholder="e.g. Yahya Khan"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full mb-3 text-[13px] bg-white border border-line rounded-md px-3 py-2 focus:border-burgundy-500"
+                className="w-full mb-3 text-[13px] bg-field border border-line rounded-md px-3 py-2 focus:border-burgundy-500"
                 required
               />
 
@@ -93,7 +95,7 @@ export default function SignUp() {
                 placeholder="you@aus.edu"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full mb-1 text-[13px] bg-white border border-line rounded-md px-3 py-2 focus:border-burgundy-500"
+                className="w-full mb-1 text-[13px] bg-field border border-line rounded-md px-3 py-2 focus:border-burgundy-500"
                 required
               />
               <div className="text-[11px] text-faint mb-3">
@@ -107,7 +109,7 @@ export default function SignUp() {
                 placeholder="At least 8 characters"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full mb-3 text-[13px] bg-white border border-line rounded-md px-3 py-2 focus:border-burgundy-500"
+                className="w-full mb-3 text-[13px] bg-field border border-line rounded-md px-3 py-2 focus:border-burgundy-500"
                 required
               />
 
@@ -118,7 +120,7 @@ export default function SignUp() {
                 placeholder="••••••••"
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
-                className="w-full mb-3 text-[13px] bg-white border border-line rounded-md px-3 py-2 focus:border-burgundy-500"
+                className="w-full mb-3 text-[13px] bg-field border border-line rounded-md px-3 py-2 focus:border-burgundy-500"
                 required
               />
 
@@ -131,7 +133,7 @@ export default function SignUp() {
               </button>
 
               {error && (
-                <div className="mt-3 px-2.5 py-2 rounded-md bg-[#FBE6E5] text-[#A5372E] text-[12px]">
+                <div className="mt-3 px-2.5 py-2 rounded-md bg-danger-bg text-danger-fg text-[12px]">
                   {error}
                 </div>
               )}

@@ -33,14 +33,14 @@ export function DefaultPasswordBanner({ onOpen }: { onOpen: () => void }) {
   if (!show) return null;
 
   return (
-    <div className="flex items-center gap-3 px-6 py-2.5 bg-[#FCF0D9] border-b border-[#E8D5A8] text-[#8A5D0C]">
+    <div className="flex items-center gap-3 px-6 py-2.5 bg-warn-bg border-b border-warn-line text-warn-fg">
       <span className="text-[13px] leading-snug flex-1">
         <span className="font-semibold">You&apos;re still using the default password.</span>{" "}
         Set your own so nobody else can sign in as you.
       </span>
       <button
         onClick={onOpen}
-        className="font-semibold text-[12px] text-white bg-[#8A5D0C] hover:bg-[#6F4A09] rounded-md px-2.5 py-1.5 whitespace-nowrap"
+        className="font-semibold text-[12px] text-white bg-burgundy-600 hover:bg-burgundy-700 rounded-md px-2.5 py-1.5 whitespace-nowrap"
       >
         Change password
       </button>
@@ -54,7 +54,7 @@ export function DefaultPasswordBanner({ onOpen }: { onOpen: () => void }) {
           setShow(false);
         }}
         title="Dismiss for now"
-        className="text-[#8A5D0C]/60 hover:text-[#8A5D0C] text-[17px] leading-none px-1"
+        className="text-warn-fg opacity-60 hover:opacity-100 text-[17px] leading-none px-1"
       >
         ×
       </button>
@@ -110,7 +110,7 @@ export function ChangePasswordModal({
 
   return (
     <>
-      <div className="fixed inset-0 bg-[rgba(26,29,35,.44)] z-50" onClick={onClose} />
+      <div className="fixed inset-0 bg-overlay z-50" onClick={onClose} />
       <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(400px,94vw)] z-[51] bg-card rounded-xl shadow-modal flex flex-col overflow-hidden animate-pop">
         <div className="px-[18px] py-[15px] border-b border-line flex items-start gap-2.5">
           <div className="flex-1">
@@ -130,13 +130,13 @@ export function ChangePasswordModal({
         {done ? (
           <>
             <div className="px-[18px] py-4">
-              <div className="px-2.5 py-2 rounded-md bg-[#E3F1E7] text-[#2C6B42] text-[12.5px] leading-relaxed">
+              <div className="px-2.5 py-2 rounded-md bg-ok-bg text-ok-fg text-[12.5px] leading-relaxed">
                 <span className="font-semibold block mb-0.5">Password changed</span>
                 Use your new password next time you sign in. If your browser offered to save it,
                 accept and it will fill in for you.
               </div>
             </div>
-            <div className="px-[18px] py-3 border-t border-line bg-[#FAFBFC] flex">
+            <div className="px-[18px] py-3 border-t border-line bg-sunken flex">
               <div className="flex-1" />
               <button
                 onClick={onClose}
@@ -158,7 +158,7 @@ export function ChangePasswordModal({
                   autoComplete="username"
                   value={email}
                   readOnly
-                  className="w-full text-[13px] bg-[#F7F8FA] border border-line rounded-md px-2.5 py-2 text-muted"
+                  className="w-full text-[13px] bg-subtle border border-line rounded-md px-2.5 py-2 text-muted"
                 />
               </L>
 
@@ -168,7 +168,7 @@ export function ChangePasswordModal({
                   autoComplete="current-password"
                   value={current}
                   onChange={(e) => setCurrent(e.target.value)}
-                  className="w-full text-[13px] bg-white border border-line rounded-md px-2.5 py-2 focus:border-burgundy-500"
+                  className="w-full text-[13px] bg-field border border-line rounded-md px-2.5 py-2 focus:border-burgundy-500"
                   required
                   autoFocus
                 />
@@ -181,7 +181,7 @@ export function ChangePasswordModal({
                   placeholder="At least 8 characters"
                   value={next}
                   onChange={(e) => setNext(e.target.value)}
-                  className="w-full text-[13px] bg-white border border-line rounded-md px-2.5 py-2 focus:border-burgundy-500"
+                  className="w-full text-[13px] bg-field border border-line rounded-md px-2.5 py-2 focus:border-burgundy-500"
                   required
                 />
               </L>
@@ -192,7 +192,7 @@ export function ChangePasswordModal({
                   autoComplete="new-password"
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
-                  className="w-full text-[13px] bg-white border border-line rounded-md px-2.5 py-2 focus:border-burgundy-500"
+                  className="w-full text-[13px] bg-field border border-line rounded-md px-2.5 py-2 focus:border-burgundy-500"
                   required
                 />
               </L>
@@ -203,13 +203,13 @@ export function ChangePasswordModal({
               </div>
 
               {error && (
-                <div className="mt-3 px-2.5 py-2 rounded-md bg-[#FBE6E5] text-[#A5372E] text-[12px]">
+                <div className="mt-3 px-2.5 py-2 rounded-md bg-danger-bg text-danger-fg text-[12px]">
                   {error}
                 </div>
               )}
             </div>
 
-            <div className="px-[18px] py-3 border-t border-line bg-[#FAFBFC] flex gap-2">
+            <div className="px-[18px] py-3 border-t border-line bg-sunken flex gap-2">
               <button
                 type="submit"
                 disabled={busy}

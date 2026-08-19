@@ -17,9 +17,29 @@ export const metadata: Metadata = {
   description: "Strategic Communications task tracker — American University of Sharjah.",
 };
 
+/*
+  Runs before the first paint: applies the saved theme (falling back to the OS
+  preference) so the page never flashes light before switching to dark. It has
+  to be inline and blocking — a React effect runs too late to prevent the flash.
+*/
+const themeBoot = `
+(function () {
+  try {
+    var saved = localStorage.getItem("scm.theme");
+    var dark = saved
+      ? saved === "dark"
+      : window.matchMedia("(prefers-color-scheme: dark)").matches;
+    if (dark) document.documentElement.classList.add("dark");
+  } catch (e) {}
+})();
+`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={roboto.variable}>
+    <html lang="en" className={roboto.variable} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeBoot }} />
+      </head>
       <body>
         <Providers>{children}</Providers>
       </body>

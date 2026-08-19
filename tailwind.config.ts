@@ -1,27 +1,60 @@
 import type { Config } from "tailwindcss";
 
+/*
+  Colours are CSS variables defined in globals.css (light values on :root, dark
+  overrides under .dark), so toggling the `dark` class on <html> re-themes every
+  component without touching a single class name.
+*/
 const config: Config = {
   content: ["./src/**/*.{ts,tsx}"],
+  darkMode: "class",
   theme: {
     extend: {
       colors: {
         burgundy: {
-          DEFAULT: "#8B1E2D",
-          50: "#FBEDEE",
-          100: "#F6DADC",
-          400: "#C25A66",
-          500: "#A03544",
-          600: "#8B1E2D",
-          700: "#761826",
-          800: "#5E131E",
+          DEFAULT: "var(--c-brand)",
+          50: "var(--c-brand-soft)",
+          100: "var(--c-brand-soft)",
+          400: "var(--c-brand-line)",
+          500: "var(--c-brand-line)",
+          600: "var(--c-brand)",
+          700: "var(--c-brand-hover)",
+          800: "var(--c-brand-hover)",
         },
-        surface: "#F5F6F7",
-        card: "#FFFFFF",
-        line: "#E4E7EB",
-        line2: "#EEF0F3",
-        ink: "#1A1D23",
-        muted: "#6A727E",
-        faint: "#98A0AC",
+        sidebar: "var(--c-sidebar)",
+
+        surface: "var(--c-surface)",
+        card: "var(--c-card)",
+        field: "var(--c-field)",
+        subtle: "var(--c-subtle)",
+        sunken: "var(--c-sunken)",
+        rowhover: "var(--c-rowhover)",
+        groupbar: "var(--c-groupbar)",
+
+        line: "var(--c-line)",
+        line2: "var(--c-line2)",
+
+        ink: "var(--c-ink)",
+        ink2: "var(--c-ink2)",
+        muted: "var(--c-muted)",
+        faint: "var(--c-faint)",
+
+        bar: "var(--c-bar)",
+        overlay: "var(--c-overlay)",
+
+        quiet: { bg: "var(--c-quiet-bg)", fg: "var(--c-quiet-fg)" },
+        warn: {
+          bg: "var(--c-warn-bg)",
+          fg: "var(--c-warn-fg)",
+          line: "var(--c-warn-line)",
+        },
+        info: { bg: "var(--c-info-bg)", fg: "var(--c-info-fg)" },
+        ok: { bg: "var(--c-ok-bg)", fg: "var(--c-ok-fg)" },
+        danger: {
+          bg: "var(--c-danger-bg)",
+          fg: "var(--c-danger-fg)",
+          line: "var(--c-danger-line)",
+        },
       },
       fontFamily: {
         serif: ["var(--font-serif)", "Georgia", "serif"],
@@ -29,9 +62,9 @@ const config: Config = {
         mono: ["var(--font-mono)", "ui-monospace", "monospace"],
       },
       boxShadow: {
-        card: "0 1px 2px rgba(26,29,35,.05), 0 1px 3px rgba(26,29,35,.04)",
-        pop: "0 4px 14px rgba(26,29,35,.10)",
-        modal: "0 20px 50px rgba(26,29,35,.28)",
+        card: "0 1px 2px rgba(0,0,0,.05), 0 1px 3px rgba(0,0,0,.04)",
+        pop: "0 4px 14px rgba(0,0,0,.10)",
+        modal: "0 20px 50px rgba(0,0,0,.28)",
       },
     },
   },

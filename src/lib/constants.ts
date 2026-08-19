@@ -25,11 +25,11 @@ export type Role = "manager" | "staff";
 
 // Tailwind-friendly colour tokens for each status pill.
 export const STATUS_STYLES: Record<Status, { bg: string; fg: string; label: string }> = {
-  "Not Started": { bg: "#EFF1F4", fg: "#5D6A7C", label: "Not Started" },
-  "In Progress": { bg: "#FCF0D9", fg: "#8A5D0C", label: "In Progress" },
-  "In Review": { bg: "#E4EDF9", fg: "#1E5091", label: "In Review" },
-  Completed: { bg: "#E3F1E7", fg: "#2C6B42", label: "Completed" },
-  Blocked: { bg: "#FBE6E5", fg: "#A5372E", label: "Blocked" },
+  "Not Started": { bg: "var(--c-quiet-bg)", fg: "var(--c-quiet-fg)", label: "Not Started" },
+  "In Progress": { bg: "var(--c-warn-bg)", fg: "var(--c-warn-fg)", label: "In Progress" },
+  "In Review": { bg: "var(--c-info-bg)", fg: "var(--c-info-fg)", label: "In Review" },
+  Completed: { bg: "var(--c-ok-bg)", fg: "var(--c-ok-fg)", label: "Completed" },
+  Blocked: { bg: "var(--c-danger-bg)", fg: "var(--c-danger-fg)", label: "Blocked" },
 };
 
 export function isStatus(v: unknown): v is Status {

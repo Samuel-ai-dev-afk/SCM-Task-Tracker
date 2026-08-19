@@ -2,11 +2,106 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+  Every colour in the app resolves to one of these variables, so the whole
+  product switches theme by toggling the `dark` class on <html>. Components
+  reference them through Tailwind tokens (bg-card, text-ink, bg-danger-bg …)
+  rather than hard-coded hex.
+*/
 :root {
   color-scheme: light;
-  /* Everything uses Roboto — alias the old serif/mono slots to the sans var. */
+
+  /* Type — all three slots currently point at Roboto. */
   --font-serif: var(--font-sans);
   --font-mono: var(--font-sans);
+
+  /* Surfaces */
+  --c-surface: #f5f6f7;
+  --c-card: #ffffff;
+  --c-field: #ffffff;
+  --c-subtle: #f7f8fa;
+  --c-sunken: #fafbfc;
+  --c-rowhover: #f8fafc;
+  --c-groupbar: #eef0f3;
+
+  /* Lines */
+  --c-line: #e4e7eb;
+  --c-line2: #eef0f3;
+
+  /* Text */
+  --c-ink: #1a1d23;
+  --c-ink2: #414c5c;
+  --c-muted: #6a727e;
+  --c-faint: #98a0ac;
+
+  /* Brand */
+  --c-brand: #8b1e2d;
+  --c-brand-hover: #761826;
+  --c-brand-soft: #fbedee;
+  --c-brand-line: #a03544;
+  --c-sidebar: #8b1e2d;
+
+  /* Status + feedback pairs */
+  --c-quiet-bg: #eff1f4;
+  --c-quiet-fg: #5d6a7c;
+  --c-warn-bg: #fcf0d9;
+  --c-warn-fg: #8a5d0c;
+  --c-warn-line: #e8d5a8;
+  --c-info-bg: #e4edf9;
+  --c-info-fg: #1e5091;
+  --c-ok-bg: #e3f1e7;
+  --c-ok-fg: #2c6b42;
+  --c-danger-bg: #fbe6e5;
+  --c-danger-fg: #a5372e;
+  --c-danger-line: #e9c4c0;
+
+  /* Misc */
+  --c-overlay: rgba(26, 29, 35, 0.44);
+  --c-bar: #8a94a6;
+  --c-scroll: #d6dbe1;
+}
+
+.dark {
+  color-scheme: dark;
+
+  --c-surface: #0f1219;
+  --c-card: #161a22;
+  --c-field: #1b202a;
+  --c-subtle: #1b202a;
+  --c-sunken: #131720;
+  --c-rowhover: #1c2129;
+  --c-groupbar: #1c2129;
+
+  --c-line: #2b3240;
+  --c-line2: #232a36;
+
+  --c-ink: #e8ebf0;
+  --c-ink2: #c4cbd6;
+  --c-muted: #9aa3b0;
+  --c-faint: #6f7887;
+
+  --c-brand: #a03544;
+  --c-brand-hover: #8b1e2d;
+  --c-brand-soft: #2a1216;
+  --c-brand-line: #c25a66;
+  --c-sidebar: #5e131e;
+
+  --c-quiet-bg: #242b37;
+  --c-quiet-fg: #a6afbc;
+  --c-warn-bg: #3a2d10;
+  --c-warn-fg: #e7be68;
+  --c-warn-line: #4c3c16;
+  --c-info-bg: #14273d;
+  --c-info-fg: #8fbdf0;
+  --c-ok-bg: #12301e;
+  --c-ok-fg: #77c793;
+  --c-danger-bg: #3a1d1b;
+  --c-danger-fg: #f09a92;
+  --c-danger-line: #562926;
+
+  --c-overlay: rgba(0, 0, 0, 0.62);
+  --c-bar: #6f7887;
+  --c-scroll: #39414f;
 }
 
 html,
@@ -15,16 +110,24 @@ body {
 }
 
 body {
-  background: #f5f6f7;
-  color: #1a1d23;
+  background: var(--c-surface);
+  color: var(--c-ink);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   font-family: var(--font-sans), system-ui, sans-serif;
 }
 
+/* Theme changes shouldn't strobe, but respect reduced-motion. */
+@media (prefers-reduced-motion: no-preference) {
+  body,
+  .theme-fade {
+    transition: background-color 0.18s ease, color 0.18s ease;
+  }
+}
+
 /* Visible keyboard focus everywhere. */
 :focus-visible {
-  outline: 2px solid #8b1e2d;
+  outline: 2px solid var(--c-brand-line);
   outline-offset: 2px;
 }
 button:focus-visible,
@@ -32,30 +135,41 @@ a:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 2px solid #8b1e2d;
+  outline: 2px solid var(--c-brand-line);
   outline-offset: 1px;
 }
 
 ::selection {
-  background: #fbedee;
+  background: var(--c-brand-soft);
+  color: var(--c-ink);
 }
 
 /* Native date pickers, styled to match the mono treatment. */
 input[type="date"] {
   font-family: var(--font-mono), ui-monospace, monospace;
 }
+/* Make the native calendar glyph legible on dark fields. */
+.dark input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) opacity(0.65);
+}
+
+/* Placeholders shouldn't shout in either theme. */
+::placeholder {
+  color: var(--c-faint);
+  opacity: 1;
+}
 
 /* Thin, quiet scrollbars for dense tables. */
 .scroll-quiet {
   scrollbar-width: thin;
-  scrollbar-color: #cdd4dc transparent;
+  scrollbar-color: var(--c-scroll) transparent;
 }
 .scroll-quiet::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 .scroll-quiet::-webkit-scrollbar-thumb {
-  background: #d6dbe1;
+  background: var(--c-scroll);
   border-radius: 4px;
 }
 

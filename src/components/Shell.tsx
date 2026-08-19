@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { Avatar } from "@/components/ui";
 import { ChangePasswordModal, DefaultPasswordBanner } from "@/components/ChangePassword";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import type { Role } from "@/lib/constants";
 
 type Me = { id: string; name: string; email: string; role: Role };
@@ -28,7 +29,7 @@ export function Shell({ me, children }: { me: Me; children: React.ReactNode }) {
   return (
     <div className="min-h-screen md:h-screen md:overflow-hidden flex flex-col md:flex-row bg-surface">
       {/* Sidebar */}
-      <nav className="md:w-[210px] shrink-0 bg-burgundy-600 text-white flex md:flex-col flex-row items-center md:items-stretch">
+      <nav className="md:w-[210px] shrink-0 bg-sidebar text-white flex md:flex-col flex-row items-center md:items-stretch">
         <div className="px-[18px] py-[17px] md:border-b border-white/10 shrink-0 border-r md:border-r-0 border-white/10">
           <span className="font-serif font-bold text-[18px] leading-none block">SCM</span>
           <span className="hidden md:block font-mono text-[9.5px] tracking-[0.11em] uppercase text-white/55 mt-1.5">
@@ -46,7 +47,7 @@ export function Shell({ me, children }: { me: Me; children: React.ReactNode }) {
                 className={
                   "flex items-center gap-2.5 md:w-full px-2.5 py-2.5 rounded-md text-[13.5px] whitespace-nowrap transition " +
                   (on
-                    ? "bg-white/12 text-white font-semibold md:shadow-[inset_2px_0_0_#E9A6AE]"
+                    ? "bg-white/12 text-white font-semibold md:shadow-[inset_2px_0_0_var(--c-brand-line)]"
                     : "text-white/70 hover:bg-white/10 hover:text-white font-medium")
                 }
               >
@@ -65,6 +66,7 @@ export function Shell({ me, children }: { me: Me; children: React.ReactNode }) {
               {isManager ? "Manager" : "Staff"}
             </div>
           </div>
+          <ThemeToggle className="text-white/60 hover:text-white hover:bg-white/10 rounded p-1.5 leading-none" />
           <button
             onClick={() => setChangingPassword(true)}
             title="Change password"
