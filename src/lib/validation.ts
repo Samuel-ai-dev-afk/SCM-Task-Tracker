@@ -26,7 +26,9 @@ const minutesSpent = z
 export const createTaskSchema = z.object({
   title: z.string().trim().min(1, "Give the task a title.").max(200),
   description: z.string().max(4000).optional().default(""),
-  assignedToId: z.string().min(1, "Choose who this is for."),
+  // Optional: staff adding their own work are always the assignee, so the
+  // route fills this in. Managers must choose (checked in the route).
+  assignedToId: z.string().min(1, "Choose who this is for.").optional(),
   assignedFromId: z.string().min(1).optional(),
   strategicPillar: z.enum(PILLARS).nullable().optional(),
   status: z.enum(STATUSES).optional().default("Not Started"),

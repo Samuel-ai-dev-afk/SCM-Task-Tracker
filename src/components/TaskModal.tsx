@@ -48,11 +48,15 @@ export function TaskModal({
   onChanged: () => void;
 }) {
   const isManager = me.role === "manager";
+  // Staff may fill in the details of a task they are adding themselves.
+  // On an existing task they keep the restricted view; the API enforces the
+  // same split, so this is presentation only.
+  const canEdit = isManager || isNew;
 
   const [form, setForm] = useState<Form>(() => ({
     title: task?.title ?? "",
     assignedFromId: task?.assignedFromId ?? me.id,
-    assignedToId: task?.assignedToId ?? staff[0]?.id ?? "",
+    assignedToId: task?.assignedToId ?? (isManager ? staff[0]?.id ?? "" : me.id),
     description: task?.description ?? "",
     strategicPillar: task?.strategicPillar ?? "",
     dateAssigned: task?.dateAssigned ?? today(),
@@ -111,8 +115,14 @@ export function TaskModal({
   // How early/late the task was finished vs the deadline (same for both roles).
   const variance = deadlineVariance(form.deadline, form.dateCompleted);
 
-  const fromName = managers.find((u) => u.id === form.assignedFromId)?.name ?? task?.assignedFromName ?? "";
-  const toName = staff.find((u) => u.id === form.assignedToId)?.name ?? task?.assignedToName ?? "";
+  const fromName =
+    managers.find((u) => u.id === form.assignedFromId)?.name ??
+    task?.assignedFromName ??
+    (isNew ? me.name : "");
+  const toName =
+    staff.find((u) => u.id === form.assignedToId)?.name ??
+    task?.assignedToName ??
+    (isNew ? me.name : "");
 
   async function save() {
     setError("");
@@ -199,10 +209,10 @@ export function TaskModal({
         <div className="px-[18px] py-[15px] border-b border-line flex items-start gap-2.5">
           <div className="flex-1 min-w-0">
             <span className="font-mono text-[9px] tracking-[0.1em] uppercase text-faint block mb-1">
-              {isNew ? "New assignment" : `Week ${w} · ${weekRange(w)}`}
+              {isNew ? (isManager ? "New assignment" : "New task") : `Week ${w} · ${weekRange(w)}`}
             </span>
             <h3 className="font-serif font-bold text-[16px] leading-tight text-ink">
-              {isNew ? "Assign a task" : form.title || task?.title}
+              {isNew ? (isManager ? "Assign a task" : "Add a task") : form.title || task?.title}
             </h3>
           </div>
           <button
@@ -215,7 +225,7 @@ export function TaskModal({
 
         {/* Body */}
         <div className="px-[18px] py-4 overflow-y-auto scroll-quiet flex-1">
-          {isManager && (
+          {canEdit && (
             <Field label="Task">
               <input
                 value={form.title}
@@ -264,7 +274,7 @@ export function TaskModal({
           </div>
 
           <Field label="Description">
-            {isManager ? (
+            {canEdit ? (
               <textarea
                 value={form.description}
                 onChange={(e) => set("description", e.target.value)}
@@ -277,7 +287,7 @@ export function TaskModal({
           </Field>
 
           <Field label="Strategic pillar">
-            {isManager ? (
+            {canEdit ? (
               <select
                 value={form.strategicPillar}
                 onChange={(e) => set("strategicPillar", e.target.value)}
@@ -297,7 +307,7 @@ export function TaskModal({
 
           <div className="flex gap-2.5">
             <Field label="Assigned" className="flex-1 min-w-0">
-              {isManager ? (
+              {canEdit ? (
                 <input
                   type="date"
                   value={form.dateAssigned}
@@ -309,7 +319,7 @@ export function TaskModal({
               )}
             </Field>
             <Field label="Deadline" className="flex-1 min-w-0">
-              {isManager ? (
+              {canEdit ? (
                 <input
                   type="date"
                   value={form.deadline}
@@ -404,7 +414,9 @@ export function TaskModal({
                 ? varianceLabel(variance)
                 : form.deadline
                   ? "Add the completed date to see the result"
-                  : "Manager sets a deadline; staff sets the completed date"}
+                  : isNew
+                    ? "Set a deadline and a completed date to see the result"
+                    : "Manager sets a deadline; staff sets the completed date"}
             </div>
           </Field>
 
@@ -480,7 +492,7 @@ export function TaskModal({
             disabled={busy}
             className="font-semibold text-[13px] text-white bg-burgundy-600 hover:bg-burgundy-700 rounded-md px-3.5 py-2 transition disabled:opacity-60"
           >
-            {isNew ? "Assign task" : "Save changes"}
+            {isNew ? (isManager ? "Assign task" : "Add task") : "Save changes"}
           </button>
           {!isNew && isManager && (
             <button
