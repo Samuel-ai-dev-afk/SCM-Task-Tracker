@@ -33,7 +33,7 @@ export function StatusPill({ status }: { status: Status }) {
   const s = STATUS_STYLES[status] ?? STATUS_STYLES["Not Started"];
   return (
     <span
-      className="inline-block font-mono text-[10px] font-semibold uppercase tracking-wider px-2 py-1 rounded-[5px] whitespace-nowrap"
+      className="inline-block font-mono text-[10px] font-semibold uppercase tracking-wider px-2 py-1 rounded-md whitespace-nowrap"
       style={{ background: s.bg, color: s.fg }}
     >
       {s.label}

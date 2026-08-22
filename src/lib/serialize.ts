@@ -1,6 +1,6 @@
 import type { Task, User, Comment } from "@prisma/client";
 import type { TaskDTO, UserDTO, CommentDTO } from "@/types";
-import type { Status, Pillar, Role } from "@/lib/constants";
+import type { Status, Pillar, Role, Channel } from "@/lib/constants";
 import { toDateInput } from "@/lib/dates";
 
 type TaskWithRelations = Task & {
@@ -22,6 +22,8 @@ export function serializeTask(t: TaskWithRelations): TaskDTO {
     deadline: t.deadline ? toDateInput(t.deadline) : null,
     dateCompleted: t.dateCompleted ? toDateInput(t.dateCompleted) : null,
     minutesSpent: t.minutesSpent ?? null,
+    publishDate: t.publishDate ? toDateInput(t.publishDate) : null,
+    channel: (t.channel as Channel | null) ?? null,
     assignedFromId: t.assignedFromId,
     assignedFromName: t.assignedFrom.name,
     assignedToId: t.assignedToId,

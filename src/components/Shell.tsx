@@ -26,6 +26,7 @@ export function Shell({ me, children }: { me: Me; children: React.ReactNode }) {
           { href: "/analytics", label: "Analytics", icon: "▦" },
         ]
       : []),
+    { href: "/calendar", label: "Calendar", icon: "▢" },
     { href: "/hours", label: "Hours", icon: "◷" },
     { href: "/settings", label: "Settings", icon: "⚙" },
   ];
@@ -35,8 +36,8 @@ export function Shell({ me, children }: { me: Me; children: React.ReactNode }) {
       {/* Sidebar */}
       <nav className="md:w-[210px] shrink-0 bg-sidebar text-white flex md:flex-col flex-row items-center md:items-stretch">
         <div className="px-[18px] py-[17px] md:border-b border-white/10 shrink-0 border-r md:border-r-0 border-white/10">
-          <span className="font-serif font-bold text-[18px] leading-none block">SCM</span>
-          <span className="hidden md:block font-mono text-[9.5px] tracking-[0.11em] uppercase text-white/55 mt-1.5">
+          <span className="font-serif font-bold text-[19px] leading-none block">SCM</span>
+          <span className="hidden md:block font-mono text-[10px] tracking-[0.11em] uppercase text-white/55 mt-1.5">
             Task Tracker
           </span>
         </div>
@@ -49,13 +50,13 @@ export function Shell({ me, children }: { me: Me; children: React.ReactNode }) {
                 key={n.href}
                 href={n.href}
                 className={
-                  "flex items-center gap-2.5 md:w-full px-2.5 py-2.5 rounded-md text-[13.5px] whitespace-nowrap transition " +
+                  "flex items-center gap-2.5 md:w-full px-2.5 py-2.5 rounded-lg text-[13.5px] whitespace-nowrap transition " +
                   (on
                     ? "bg-white/12 text-white font-semibold md:shadow-[inset_2px_0_0_var(--c-brand-line)]"
                     : "text-white/70 hover:bg-white/10 hover:text-white font-medium")
                 }
               >
-                <span className="text-[14px] opacity-85 w-4 text-center">{n.icon}</span>
+                <span className="text-[15px] opacity-85 w-4 text-center">{n.icon}</span>
                 {n.label}
               </Link>
             );
@@ -66,7 +67,7 @@ export function Shell({ me, children }: { me: Me; children: React.ReactNode }) {
           <Avatar name={me.name} size={30} />
           <div className="hidden md:block flex-1 min-w-0">
             <div className="text-[12.5px] font-semibold truncate">{me.name}</div>
-            <div className="font-mono text-[9px] tracking-[0.09em] uppercase text-white/55">
+            <div className="font-mono text-[10px] tracking-[0.09em] uppercase text-white/55">
               {isManager ? "Manager" : "Staff"}
             </div>
           </div>

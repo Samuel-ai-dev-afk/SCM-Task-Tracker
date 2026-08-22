@@ -33,13 +33,13 @@ export function DefaultPasswordBanner({ onOpen }: { onOpen: () => void }) {
 
   return (
     <div className="flex items-center gap-3 px-6 py-2.5 bg-warn-bg border-b border-warn-line text-warn-fg">
-      <span className="text-[13px] leading-snug flex-1">
+      <span className="text-[13.5px] leading-snug flex-1">
         <span className="font-semibold">You&apos;re still using the default password.</span>{" "}
         Set your own so nobody else can sign in as you.
       </span>
       <button
         onClick={onOpen}
-        className="font-semibold text-[12px] text-white bg-burgundy-600 hover:bg-burgundy-700 rounded-md px-2.5 py-1.5 whitespace-nowrap"
+        className="font-semibold text-[12.5px] text-white bg-burgundy-600 hover:bg-burgundy-700 rounded-lg px-2.5 py-1.5 whitespace-nowrap"
       >
         Change password
       </button>

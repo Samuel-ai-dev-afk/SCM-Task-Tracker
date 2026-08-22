@@ -21,6 +21,22 @@ export const PILLARS = [
 
 export type Pillar = (typeof PILLARS)[number];
 
+// Where a piece of content goes live.
+export const CHANNELS = [
+  "Instagram",
+  "LinkedIn",
+  "X / Twitter",
+  "Facebook",
+  "TikTok",
+  "Website",
+  "Newsletter",
+  "Press release",
+  "Print",
+  "Internal",
+] as const;
+
+export type Channel = (typeof CHANNELS)[number];
+
 export type Role = "manager" | "staff";
 
 // Tailwind-friendly colour tokens for each status pill.

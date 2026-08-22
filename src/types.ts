@@ -1,4 +1,4 @@
-import type { Role, Status, Pillar } from "@/lib/constants";
+import type { Role, Status, Pillar, Channel } from "@/lib/constants";
 
 export type UserDTO = {
   id: string;
@@ -30,6 +30,8 @@ export type TaskDTO = {
   deadline: string | null; // YYYY-MM-DD (when manager expects completion)
   dateCompleted: string | null; // YYYY-MM-DD (when actually completed)
   minutesSpent: number | null; // time logged by the assignee, in minutes
+  publishDate: string | null; // YYYY-MM-DD (when it goes live)
+  channel: Channel | null;
   assignedFromId: string;
   assignedFromName: string;
   assignedToId: string;
