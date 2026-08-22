@@ -149,7 +149,9 @@ export function CalendarBoard({ me }: { me: Me }) {
           </div>
         ) : (
           <div className="bg-card border border-line rounded-[14px] shadow-card overflow-hidden">
-            <div className="grid grid-cols-7">
+            {/* Seven day columns need room; scroll rather than squash them. */}
+            <div className="overflow-x-auto scroll-quiet">
+            <div className="grid grid-cols-7 min-w-[780px]">
               {DAY_NAMES.map((d, i) => (
                 <div key={d}
                   className={
@@ -210,6 +212,7 @@ export function CalendarBoard({ me }: { me: Me }) {
                   </button>
                 );
               })}
+            </div>
             </div>
           </div>
         )}
