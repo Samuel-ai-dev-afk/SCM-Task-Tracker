@@ -1,4 +1,4 @@
-import type { Role, Status, Pillar, Channel } from "@/lib/constants";
+import type { Role, Status, Pillar, Channel, EntryKind } from "@/lib/constants";
 
 export type UserDTO = {
   id: string;
@@ -9,6 +9,17 @@ export type UserDTO = {
   approved: boolean; // false = self-signup waiting for a manager's decision
   createdAt: string; // ISO
   openCount?: number; // populated on the team view
+};
+
+export type CalendarEntryDTO = {
+  id: string;
+  title: string;
+  kind: EntryKind;
+  date: string; // YYYY-MM-DD
+  time: string | null; // "HH:MM" or null for all day
+  notes: string;
+  createdById: string;
+  createdByName: string;
 };
 
 export type CommentDTO = {

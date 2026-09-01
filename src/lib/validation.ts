@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { STATUSES, PILLARS, CHANNELS } from "@/lib/constants";
+import { STATUSES, PILLARS, CHANNELS, ENTRY_KINDS } from "@/lib/constants";
 
 const dateStr = z
   .string()
@@ -119,6 +119,25 @@ export const hoursQuerySchema = z.object({
   to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid end date."),
   userId: z.string().min(1).optional(),
 });
+
+// A calendar entry: a meeting, event, planned post or reminder. No assignee and
+// no status — it isn't work, it's something on the schedule.
+export const calendarEntrySchema = z.object({
+  title: z.string().trim().min(1, "Give it a name.").max(200),
+  kind: z.enum(ENTRY_KINDS),
+  date: dateStr,
+  // "HH:MM" on a 24-hour clock, or blank for all day.
+  time: z
+    .string()
+    .regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Use a time like 14:30.")
+    .or(z.literal(""))
+    .nullable()
+    .optional(),
+  notes: z.string().max(2000).optional().default(""),
+});
+
+// Every field optional when editing an existing entry.
+export const calendarEntryPatchSchema = calendarEntrySchema.partial();
 
 // Changing your own password. The account comes from the session, never the
 // body, so there's no user id here.

@@ -36,6 +36,7 @@ model User {
   tasksAssigned Task[]    @relation("assignedFrom")
   tasksReceived Task[]    @relation("assignedTo")
   comments      Comment[]
+  calendarEntries CalendarEntry[]
 
   @@index([active])
 }
@@ -79,6 +80,31 @@ model Task {
   @@index([deadline])
   @@index([dateCompleted])
   @@index([publishDate])
+}
+
+/*
+  Something on the calendar that isn't assigned work: a meeting, an event, a
+  planned post, a reminder. Deliberately NOT a Task — it has no assignee,
+  deadline or status, and it must never appear on the task board or count
+  toward anyone's logged hours.
+*/
+model CalendarEntry {
+  id        String   @id @default(cuid())
+  title     String
+  // "Meeting" | "Event" | "Post" | "Reminder" — validated in the app layer.
+  kind      String
+  date      DateTime
+  // Clock time as "HH:MM", or null for an all-day entry. Stored as text so it
+  // can't drift with timezones the way a DateTime would.
+  time      String?
+  notes     String   @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  createdById String
+  createdBy   User   @relation(fields: [createdById], references: [id])
+
+  @@index([date])
 }
 
 model Comment {

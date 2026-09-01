@@ -37,6 +37,21 @@ export const CHANNELS = [
 
 export type Channel = (typeof CHANNELS)[number];
 
+// Things a manager can put straight onto the calendar, alongside the tasks
+// that already appear there via their publish date.
+export const ENTRY_KINDS = ["Meeting", "Event", "Post", "Reminder"] as const;
+
+export type EntryKind = (typeof ENTRY_KINDS)[number];
+
+// Entries are tinted by kind, where tasks are tinted by status — so the two
+// kinds of thing stay tellable apart at a glance on a busy day.
+export const ENTRY_STYLES: Record<EntryKind, { bg: string; fg: string }> = {
+  Meeting: { bg: "var(--c-info-bg)", fg: "var(--c-info-fg)" },
+  Event: { bg: "var(--c-brand-soft)", fg: "var(--c-brand)" },
+  Post: { bg: "var(--c-warn-bg)", fg: "var(--c-warn-fg)" },
+  Reminder: { bg: "var(--c-quiet-bg)", fg: "var(--c-quiet-fg)" },
+};
+
 export type Role = "manager" | "staff";
 
 // Tailwind-friendly colour tokens for each status pill.

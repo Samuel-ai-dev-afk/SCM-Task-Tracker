@@ -2,18 +2,23 @@ import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/authz";
 import { route } from "@/lib/http";
 import { hoursQuerySchema } from "@/lib/validation";
+import { serializeCalendarEntry } from "@/lib/serialize";
 import { toDateInput } from "@/lib/dates";
 import type { Channel, Status } from "@/lib/constants";
 
 /**
- * GET /api/calendar?from=&to= — what is going live in a date range.
+ * GET /api/calendar?from=&to= — everything on the schedule in a date range.
+ *
+ * Two different things share the calendar:
+ *   - tasks, placed by their publish date, which carry a deadline and a buffer
+ *   - entries, which a manager put there directly: meetings, events, planned
+ *     posts, reminders. These have no assignee, deadline or status.
  *
  * Deliberately visible to everyone, staff included: the point of the calendar
- * is that the whole department can see the publishing schedule and understand
- * what their deadline is feeding. It returns a narrow projection rather than
- * whole tasks — no description, file links or comments — so opening the
- * calendar never exposes more than the schedule itself. Full task detail still
- * goes through /api/tasks/:id, which keeps its row-level guard.
+ * is that the whole department can see what's happening. Tasks return a narrow
+ * projection — no description, file links or comments — so opening the calendar
+ * never exposes more than the schedule itself. Full task detail still goes
+ * through /api/tasks/:id, which keeps its row-level guard.
  */
 export async function GET(req: Request) {
   return route(async () => {
@@ -24,27 +29,35 @@ export async function GET(req: Request) {
       to: url.searchParams.get("to") ?? "",
     });
 
-    const tasks = await prisma.task.findMany({
-      where: {
-        publishDate: {
-          gte: new Date(from + "T00:00:00Z"),
-          lte: new Date(to + "T23:59:59.999Z"),
-        },
-      },
-      include: { assignedTo: { select: { id: true, name: true } } },
-      orderBy: { publishDate: "asc" },
-    });
+    const start = new Date(from + "T00:00:00Z");
+    const end = new Date(to + "T23:59:59.999Z");
 
-    return tasks.map((t) => ({
-      id: t.id,
-      title: t.title,
-      status: t.status as Status,
-      channel: (t.channel as Channel | null) ?? null,
-      publishDate: t.publishDate ? toDateInput(t.publishDate) : null,
-      deadline: t.deadline ? toDateInput(t.deadline) : null,
-      dateCompleted: t.dateCompleted ? toDateInput(t.dateCompleted) : null,
-      assignedToId: t.assignedToId,
-      assignedToName: t.assignedTo.name,
-    }));
+    const [tasks, entries] = await Promise.all([
+      prisma.task.findMany({
+        where: { publishDate: { gte: start, lte: end } },
+        include: { assignedTo: { select: { id: true, name: true } } },
+        orderBy: { publishDate: "asc" },
+      }),
+      prisma.calendarEntry.findMany({
+        where: { date: { gte: start, lte: end } },
+        include: { createdBy: { select: { id: true, name: true } } },
+        orderBy: [{ date: "asc" }, { time: "asc" }],
+      }),
+    ]);
+
+    return {
+      tasks: tasks.map((t) => ({
+        id: t.id,
+        title: t.title,
+        status: t.status as Status,
+        channel: (t.channel as Channel | null) ?? null,
+        publishDate: t.publishDate ? toDateInput(t.publishDate) : null,
+        deadline: t.deadline ? toDateInput(t.deadline) : null,
+        dateCompleted: t.dateCompleted ? toDateInput(t.dateCompleted) : null,
+        assignedToId: t.assignedToId,
+        assignedToName: t.assignedTo.name,
+      })),
+      entries: entries.map(serializeCalendarEntry),
+    };
   });
 }

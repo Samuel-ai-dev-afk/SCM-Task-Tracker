@@ -1,6 +1,6 @@
-import type { Task, User, Comment } from "@prisma/client";
-import type { TaskDTO, UserDTO, CommentDTO } from "@/types";
-import type { Status, Pillar, Role, Channel } from "@/lib/constants";
+import type { Task, User, Comment, CalendarEntry } from "@prisma/client";
+import type { TaskDTO, UserDTO, CommentDTO, CalendarEntryDTO } from "@/types";
+import type { Status, Pillar, Role, Channel, EntryKind } from "@/lib/constants";
 import { toDateInput } from "@/lib/dates";
 
 type TaskWithRelations = Task & {
@@ -53,5 +53,20 @@ export function serializeUser(u: User, openCount?: number): UserDTO {
     approved: u.approved,
     createdAt: u.createdAt.toISOString(),
     openCount,
+  };
+}
+
+export function serializeCalendarEntry(
+  e: CalendarEntry & { createdBy: Pick<User, "id" | "name"> }
+): CalendarEntryDTO {
+  return {
+    id: e.id,
+    title: e.title,
+    kind: e.kind as EntryKind,
+    date: toDateInput(e.date),
+    time: e.time ?? null,
+    notes: e.notes,
+    createdById: e.createdById,
+    createdByName: e.createdBy.name,
   };
 }
