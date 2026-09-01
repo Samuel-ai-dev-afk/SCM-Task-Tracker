@@ -118,7 +118,7 @@ export function TaskBoard({ me }: { me: Me }) {
             <select
               value={fWho}
               onChange={(e) => setFWho(e.target.value)}
-              className="text-[13px] bg-white border border-line rounded-md px-2.5 py-1.5"
+              className="text-[13px] bg-field border border-line rounded-md px-2.5 py-1.5"
             >
               <option value="all">Everyone</option>
               {staff.map((u) => (
@@ -131,7 +131,7 @@ export function TaskBoard({ me }: { me: Me }) {
             <select
               value={fStat}
               onChange={(e) => setFStat(e.target.value)}
-              className="text-[13px] bg-white border border-line rounded-md px-2.5 py-1.5"
+              className="text-[13px] bg-field border border-line rounded-md px-2.5 py-1.5"
             >
               <option value="all">Any</option>
               {STATUSES.map((s) => (
@@ -178,7 +178,7 @@ export function TaskBoard({ me }: { me: Me }) {
                 </tr>
               ) : error ? (
                 <tr>
-                  <td colSpan={cols} className="py-11 text-center text-[13px] text-[#A5372E]">
+                  <td colSpan={cols} className="py-11 text-center text-[13px] text-danger-fg">
                     {error}
                   </td>
                 </tr>
@@ -236,7 +236,7 @@ function Th({ children, className = "" }: { children: React.ReactNode; className
   return (
     <th
       className={
-        "bg-[#F7F8FA] text-left px-3.5 py-2.5 font-mono text-[9.5px] font-semibold tracking-[0.1em] uppercase text-faint border-b border-line whitespace-nowrap " +
+        "bg-subtle text-left px-3.5 py-2.5 font-mono text-[9.5px] font-semibold tracking-[0.1em] uppercase text-faint border-b border-line whitespace-nowrap " +
         className
       }
     >
@@ -249,7 +249,7 @@ function WeekGroup({ week, cols, children }: { week: number; cols: number; child
   return (
     <>
       <tr>
-        <td colSpan={cols} className="bg-[#EEF0F3] px-3.5 py-2 border-b border-line">
+        <td colSpan={cols} className="bg-groupbar px-3.5 py-2 border-b border-line">
           <b className="font-mono text-[10px] font-semibold tracking-[0.09em] uppercase text-ink">
             Week {week}
           </b>
@@ -274,7 +274,7 @@ function TaskRow({
   return (
     <tr
       onClick={onClick}
-      className="cursor-pointer hover:bg-[#F8FAFC] transition-colors border-b border-line2 last:border-0"
+      className="cursor-pointer hover:bg-rowhover transition-colors border-b border-line2 last:border-0"
     >
       <td className="px-3.5 py-3 align-middle">
         <div className="font-semibold text-[13.5px] leading-tight text-ink">{task.title}</div>

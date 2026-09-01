@@ -86,12 +86,12 @@ export function TeamBoard({ meId }: { meId: string }) {
 
       <div className="flex-1 md:overflow-auto scroll-quiet px-6 pb-6">
         {pending.length > 0 && (
-          <div className="bg-card border border-[#E9C4C0] rounded-[10px] overflow-hidden shadow-card mb-4">
-            <div className="px-3.5 py-2.5 bg-[#FBE6E5] border-b border-[#E9C4C0] flex items-center gap-2">
-              <span className="font-mono text-[9.5px] font-semibold tracking-[0.1em] uppercase text-[#A5372E]">
+          <div className="bg-card border border-danger-line rounded-[10px] overflow-hidden shadow-card mb-4">
+            <div className="px-3.5 py-2.5 bg-danger-bg border-b border-danger-line flex items-center gap-2">
+              <span className="font-mono text-[9.5px] font-semibold tracking-[0.1em] uppercase text-danger-fg">
                 Awaiting approval
               </span>
-              <span className="font-mono text-[10px] font-semibold text-white bg-[#A5372E] rounded-full px-1.5 py-0.5">
+              <span className="font-mono text-[10px] font-semibold text-white bg-burgundy-600 rounded-full px-1.5 py-0.5">
                 {pending.length}
               </span>
             </div>
@@ -123,7 +123,7 @@ export function TeamBoard({ meId }: { meId: string }) {
                 </button>
               </div>
             ))}
-            <div className="px-3.5 py-2 bg-[#FAFBFC] border-t border-line2 text-[11px] text-faint">
+            <div className="px-3.5 py-2 bg-sunken border-t border-line2 text-[11px] text-faint">
               These people signed up themselves. Approving lets them sign in and receive tasks —
               always as staff.
             </div>
@@ -137,7 +137,7 @@ export function TeamBoard({ meId }: { meId: string }) {
                 {["Name", "Role", "Current workload", ""].map((h, i) => (
                   <th
                     key={i}
-                    className="bg-[#F7F8FA] text-left px-3.5 py-2.5 font-mono text-[9.5px] font-semibold tracking-[0.1em] uppercase text-faint border-b border-line whitespace-nowrap"
+                    className="bg-subtle text-left px-3.5 py-2.5 font-mono text-[9.5px] font-semibold tracking-[0.1em] uppercase text-faint border-b border-line whitespace-nowrap"
                   >
                     {h}
                   </th>
@@ -153,7 +153,7 @@ export function TeamBoard({ meId }: { meId: string }) {
                 </tr>
               ) : error ? (
                 <tr>
-                  <td colSpan={4} className="py-11 text-center text-[13px] text-[#A5372E]">
+                  <td colSpan={4} className="py-11 text-center text-[13px] text-danger-fg">
                     {error}
                   </td>
                 </tr>
@@ -199,7 +199,7 @@ export function TeamBoard({ meId }: { meId: string }) {
                                 className="h-full rounded transition-all"
                                 style={{
                                   width: `${Math.round((n / peak) * 100)}%`,
-                                  background: hot ? "#8B1E2D" : "#8A94A6",
+                                  background: hot ? "var(--c-brand)" : "var(--c-bar)",
                                 }}
                               />
                             </div>
@@ -213,7 +213,7 @@ export function TeamBoard({ meId }: { meId: string }) {
                         {u.role === "staff" ? (
                           <button
                             onClick={() => remove(u)}
-                            className="font-semibold text-[12px] text-[#A5372E] border border-[#E9C4C0] rounded-md px-2.5 py-1.5 hover:bg-[#FBE6E5]"
+                            className="font-semibold text-[12px] text-danger-fg border border-danger-line rounded-md px-2.5 py-1.5 hover:bg-danger-bg"
                           >
                             Remove
                           </button>
@@ -278,7 +278,7 @@ function AddPersonModal({ onClose, onAdded }: { onClose: () => void; onAdded: ()
 
   return (
     <>
-      <div className="fixed inset-0 bg-[rgba(26,29,35,.44)] z-50" onClick={onClose} />
+      <div className="fixed inset-0 bg-overlay z-50" onClick={onClose} />
       <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(440px,94vw)] z-[51] bg-card rounded-xl shadow-modal flex flex-col overflow-hidden animate-pop">
         <div className="px-[18px] py-[15px] border-b border-line flex items-start gap-2.5">
           <div className="flex-1">
@@ -291,26 +291,26 @@ function AddPersonModal({ onClose, onAdded }: { onClose: () => void; onAdded: ()
         </div>
         <div className="px-[18px] py-4">
           <L label="Name">
-            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Yahya" className="w-full text-[13px] bg-white border border-line rounded-md px-2.5 py-2" />
+            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Yahya" className="w-full text-[13px] bg-field border border-line rounded-md px-2.5 py-2" />
           </L>
           <L label="Email">
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@aus.edu" className="w-full text-[13px] bg-white border border-line rounded-md px-2.5 py-2" />
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@aus.edu" className="w-full text-[13px] bg-field border border-line rounded-md px-2.5 py-2" />
           </L>
           <L label="Role">
-            <select value={role} onChange={(e) => setRole(e.target.value as "staff" | "manager")} className="w-full text-[13px] bg-white border border-line rounded-md px-2.5 py-2">
+            <select value={role} onChange={(e) => setRole(e.target.value as "staff" | "manager")} className="w-full text-[13px] bg-field border border-line rounded-md px-2.5 py-2">
               <option value="staff">Staff — receives and works on tasks</option>
               <option value="manager">Manager — assigns tasks and manages the team</option>
             </select>
           </L>
           <L label="Initial password">
-            <input value={password} onChange={(e) => setPassword(e.target.value)} className="w-full text-[13px] bg-white border border-line rounded-md px-2.5 py-2" />
+            <input value={password} onChange={(e) => setPassword(e.target.value)} className="w-full text-[13px] bg-field border border-line rounded-md px-2.5 py-2" />
           </L>
           <div className="text-[11.5px] text-faint">
             They sign in with this email and password, then can change it later.
           </div>
-          {error && <div className="mt-3 px-2.5 py-2 rounded-md bg-[#FBE6E5] text-[#A5372E] text-[12px]">{error}</div>}
+          {error && <div className="mt-3 px-2.5 py-2 rounded-md bg-danger-bg text-danger-fg text-[12px]">{error}</div>}
         </div>
-        <div className="px-[18px] py-3 border-t border-line bg-[#FAFBFC] flex gap-2">
+        <div className="px-[18px] py-3 border-t border-line bg-sunken flex gap-2">
           <button onClick={add} disabled={busy} className="font-semibold text-[13px] text-white bg-burgundy-600 hover:bg-burgundy-700 rounded-md px-3.5 py-2 disabled:opacity-60">
             Add person
           </button>

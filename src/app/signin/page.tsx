@@ -5,6 +5,7 @@ import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { rememberPassword } from "@/lib/credentials";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function SignIn() {
   const router = useRouter();
@@ -40,6 +41,7 @@ export default function SignIn() {
     <main className="relative min-h-screen grid place-items-center px-5 py-10 bg-[#0A0F1E] bg-[url('/campus.jpg')] bg-cover bg-center bg-no-repeat">
       {/* Darkens the photo so the card stays readable at any screen size. */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#0A0F1E]/30 via-[#0A0F1E]/15 to-[#0A0F1E]/50" />
+      <ThemeToggle className="absolute top-4 right-4 z-10 text-white/70 hover:text-white hover:bg-white/10 rounded-md p-2 leading-none" />
 
       <div className="relative w-full max-w-[340px] bg-card border border-white/15 rounded-xl shadow-[0_24px_60px_-12px_rgba(0,0,0,.65)] p-7">
         <div className="font-serif font-bold text-[21px] leading-tight text-ink">
@@ -59,7 +61,7 @@ export default function SignIn() {
             placeholder="you@aus.edu"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full mb-3 text-[13px] bg-white border border-line rounded-md px-3 py-2 focus:border-burgundy-500"
+            className="w-full mb-3 text-[13px] bg-field border border-line rounded-md px-3 py-2 focus:border-burgundy-500"
             required
           />
 
@@ -72,7 +74,7 @@ export default function SignIn() {
             placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full mb-3 text-[13px] bg-white border border-line rounded-md px-3 py-2 focus:border-burgundy-500"
+            className="w-full mb-3 text-[13px] bg-field border border-line rounded-md px-3 py-2 focus:border-burgundy-500"
             required
           />
 
@@ -85,7 +87,7 @@ export default function SignIn() {
           </button>
 
           {error && (
-            <div className="mt-3 px-2.5 py-2 rounded-md bg-[#FBE6E5] text-[#A5372E] text-[12px]">
+            <div className="mt-3 px-2.5 py-2 rounded-md bg-danger-bg text-danger-fg text-[12px]">
               {error}
             </div>
           )}

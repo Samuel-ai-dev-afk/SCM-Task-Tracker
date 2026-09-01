@@ -92,7 +92,7 @@ export function Analytics() {
     return <div className="p-6 text-[13px] text-faint">Loading analytics…</div>;
   }
   if (error) {
-    return <div className="p-6 text-[13px] text-[#A5372E]">{error}</div>;
+    return <div className="p-6 text-[13px] text-danger-fg">{error}</div>;
   }
 
   const kpis: [string, string | number, boolean][] = [
@@ -166,7 +166,7 @@ export function Analytics() {
                     label={p.name}
                     value={p.open}
                     max={peak}
-                    color={p.open >= peak && p.open > 0 ? "#8B1E2D" : "#8A94A6"}
+                    color={p.open >= peak && p.open > 0 ? "var(--c-brand)" : "var(--c-bar)"}
                     suffix={`open · ${p.total} total`}
                   />
                 );
@@ -188,7 +188,7 @@ export function Analytics() {
                     sub={weekRange(r.w)}
                     value={r.count}
                     max={peak}
-                    color="#8B1E2D"
+                    color="var(--c-brand)"
                     suffix={r.count === 1 ? "task" : "tasks"}
                   />
                 );
@@ -209,7 +209,7 @@ export function Analytics() {
                     label={r.label}
                     value={r.count}
                     max={peak}
-                    color={r.label === "No pillar" ? "#8A94A6" : "#8B1E2D"}
+                    color={r.label === "No pillar" ? "var(--c-bar)" : "var(--c-brand)"}
                     suffix={r.count === 1 ? "task" : "tasks"}
                   />
                 );
