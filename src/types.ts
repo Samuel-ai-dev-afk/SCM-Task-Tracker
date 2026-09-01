@@ -6,6 +6,8 @@ export type UserDTO = {
   email: string;
   role: Role;
   active: boolean;
+  approved: boolean; // false = self-signup waiting for a manager's decision
+  createdAt: string; // ISO
   openCount?: number; // populated on the team view
 };
 

@@ -59,3 +59,37 @@ export const createUserSchema = z.object({
   role: z.enum(["manager", "staff"]),
   password: z.string().min(4, "Password must be at least 4 characters.").max(200),
 });
+
+// Only AUS addresses may self-register — exactly "@aus.edu", no subdomains.
+export const AUS_EMAIL_DOMAIN = "aus.edu";
+
+export function isAusEmail(email: string): boolean {
+  return email.trim().toLowerCase().endsWith(`@${AUS_EMAIL_DOMAIN}`);
+}
+
+/**
+ * Public self-signup. Deliberately has no `role` field: this endpoint only ever
+ * creates staff accounts, so a crafted request can't mint a manager.
+ */
+export const signupSchema = z.object({
+  name: z.string().trim().min(1, "Enter your full name.").max(120),
+  email: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .email("Enter a valid email.")
+    .refine(isAusEmail, "Sign up with your @aus.edu email address."),
+  password: z.string().min(8, "Password must be at least 8 characters.").max(200),
+});
+
+// A manager's decision on a pending signup.
+export const approvalSchema = z.object({
+  action: z.enum(["approve", "decline"]),
+});
+
+// Changing your own password. The account comes from the session, never the
+// body, so there's no user id here.
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1, "Enter your current password."),
+  newPassword: z.string().min(8, "New password must be at least 8 characters.").max(200),
+});

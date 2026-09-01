@@ -1,11 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-
-// Shown on the login screen while this is a shared demo.
-const DEMO_PASSWORD = process.env.NEXT_PUBLIC_DEMO_PASSWORD || "demo1234";
+import { rememberPassword } from "@/lib/credentials";
 
 export default function SignIn() {
   const router = useRouter();
@@ -25,16 +24,24 @@ export default function SignIn() {
     });
     setBusy(false);
     if (res?.error || !res?.ok) {
-      setError("That email and password don't match. Try again.");
+      setError(
+        "That email and password don't match — or your account is still waiting for a manager to approve it."
+      );
       return;
     }
+    // Sign-in happens over fetch, so Chrome never sees a form submit navigate.
+    // Ask it to save the credential explicitly.
+    await rememberPassword(email.trim().toLowerCase(), password);
     router.replace("/tasks");
     router.refresh();
   }
 
   return (
-    <main className="min-h-screen grid place-items-center bg-surface px-5 py-10">
-      <div className="w-full max-w-[340px] bg-card border border-line rounded-xl shadow-pop p-7">
+    <main className="relative min-h-screen grid place-items-center px-5 py-10 bg-[#0A0F1E] bg-[url('/campus.jpg')] bg-cover bg-center bg-no-repeat">
+      {/* Darkens the photo so the card stays readable at any screen size. */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0A0F1E]/30 via-[#0A0F1E]/15 to-[#0A0F1E]/50" />
+
+      <div className="relative w-full max-w-[340px] bg-card border border-white/15 rounded-xl shadow-[0_24px_60px_-12px_rgba(0,0,0,.65)] p-7">
         <div className="font-serif font-bold text-[21px] leading-tight text-ink">
           Strategic Communications
         </div>
@@ -84,17 +91,13 @@ export default function SignIn() {
           )}
         </form>
 
-        <div className="mt-4 pt-3 border-t border-line2 text-center">
-          <div className="text-[10px] font-mono uppercase tracking-[0.12em] text-faint">
-            Demo access
-          </div>
-          <div className="text-[12px] text-muted mt-1.5 leading-relaxed">
-            Sign in with any AUS email below · password{" "}
-            <span className="font-mono font-semibold text-ink">{DEMO_PASSWORD}</span>
-          </div>
-          <div className="text-[11px] text-faint mt-1.5">
-            Managers: ldsilva · smmurtaza · smahmoud · sbukhari &nbsp;·&nbsp; Staff: b00101717 · amali
-            <span className="block">(all @aus.edu)</span>
+        <div className="mt-4 pt-3 border-t border-line2 text-center text-[12px] text-muted">
+          Staff without an account?{" "}
+          <Link href="/signup" className="font-semibold text-burgundy-600 hover:underline">
+            Sign up
+          </Link>
+          <div className="text-[11px] text-faint mt-1">
+            A manager approves new accounts before the first sign-in.
           </div>
         </div>
       </div>

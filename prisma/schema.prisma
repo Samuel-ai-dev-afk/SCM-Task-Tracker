@@ -26,6 +26,10 @@ model User {
   role         String
   passwordHash String
   active       Boolean  @default(true)
+  // Self-signups start unapproved (active = false, approved = false) and sit in
+  // the manager approval queue. People a manager adds directly are approved on
+  // creation, and every existing row defaults to true.
+  approved     Boolean  @default(true)
   createdAt    DateTime @default(now())
 
   // Relations

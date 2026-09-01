@@ -47,6 +47,8 @@ export function serializeUser(u: User, openCount?: number): UserDTO {
     email: u.email,
     role: u.role as Role,
     active: u.active,
+    approved: u.approved,
+    createdAt: u.createdAt.toISOString(),
     openCount,
   };
 }

@@ -26,8 +26,9 @@ export const authOptions: NextAuthOptions = {
         if (!email || !password) return null;
 
         const user = await prisma.user.findUnique({ where: { email } });
-        // Only active users may sign in.
-        if (!user || !user.active) return null;
+        // Only active, manager-approved users may sign in. A self-signup that
+        // hasn't been approved yet is both inactive and unapproved.
+        if (!user || !user.active || !user.approved) return null;
 
         const ok = await bcrypt.compare(password, user.passwordHash);
         if (!ok) return null;

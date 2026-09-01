@@ -1,16 +1,21 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { Avatar } from "@/components/ui";
+import { ChangePasswordModal, DefaultPasswordBanner } from "@/components/ChangePassword";
 import type { Role } from "@/lib/constants";
 
-type Me = { id: string; name: string; role: Role };
+type Me = { id: string; name: string; email: string; role: Role };
 
 export function Shell({ me, children }: { me: Me; children: React.ReactNode }) {
   const pathname = usePathname();
   const isManager = me.role === "manager";
+  const [changingPassword, setChangingPassword] = useState(false);
+  // Bumped after a successful change so the banner re-checks and disappears.
+  const [passwordVersion, setPasswordVersion] = useState(0);
 
   const nav = [
     { href: "/tasks", label: isManager ? "All tasks" : "My tasks", icon: "▤" },
@@ -61,6 +66,17 @@ export function Shell({ me, children }: { me: Me; children: React.ReactNode }) {
             </div>
           </div>
           <button
+            onClick={() => setChangingPassword(true)}
+            title="Change password"
+            className="text-white/60 hover:text-white hover:bg-white/10 rounded p-1.5 leading-none"
+          >
+            {/* Padlock, drawn inline so it renders identically everywhere. */}
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <rect x="4" y="11" width="16" height="10" rx="2" />
+              <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+            </svg>
+          </button>
+          <button
             onClick={() => signOut({ callbackUrl: "/signin" })}
             title="Sign out"
             className="text-white/60 hover:text-white hover:bg-white/10 rounded p-1.5 text-[15px] leading-none"
@@ -71,7 +87,22 @@ export function Shell({ me, children }: { me: Me; children: React.ReactNode }) {
       </nav>
 
       {/* Main */}
-      <main className="flex-1 min-w-0 flex flex-col md:h-screen md:overflow-hidden">{children}</main>
+      <main className="flex-1 min-w-0 flex flex-col md:h-screen md:overflow-hidden">
+        <DefaultPasswordBanner
+          key={passwordVersion}
+          onOpen={() => setChangingPassword(true)}
+        />
+        {children}
+      </main>
+
+      {changingPassword && (
+        <ChangePasswordModal
+          email={me.email}
+          name={me.name}
+          onClose={() => setChangingPassword(false)}
+          onChanged={() => setPasswordVersion((v) => v + 1)}
+        />
+      )}
     </div>
   );
 }
