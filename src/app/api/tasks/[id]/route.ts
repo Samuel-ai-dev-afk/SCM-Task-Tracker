@@ -63,6 +63,9 @@ export async function PATCH(req: Request, { params }: Params) {
           ? new Date(input.dateCompleted + "T00:00:00Z")
           : null;
       if (input.minutesSpent !== undefined) data.minutesSpent = input.minutesSpent;
+      if (input.publishDate !== undefined)
+        data.publishDate = input.publishDate ? new Date(input.publishDate + "T00:00:00Z") : null;
+      if (input.channel !== undefined) data.channel = input.channel;
       if (input.fileLink !== undefined) data.fileLink = input.fileLink ? input.fileLink : null;
       if (input.assignedToId !== undefined) {
         const assignee = await prisma.user.findFirst({

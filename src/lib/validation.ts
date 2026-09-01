@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { STATUSES, PILLARS } from "@/lib/constants";
+import { STATUSES, PILLARS, CHANNELS } from "@/lib/constants";
 
 const dateStr = z
   .string()
@@ -36,6 +36,8 @@ export const createTaskSchema = z.object({
   deadline: dateStr.nullable().optional(),
   dateCompleted: dateStr.nullable().optional(),
   minutesSpent,
+  publishDate: dateStr.nullable().optional(),
+  channel: z.enum(CHANNELS).nullable().optional(),
   fileLink: optionalUrl,
 });
 
@@ -51,6 +53,8 @@ export const managerPatchSchema = z.object({
   deadline: dateStr.nullable().optional(),
   dateCompleted: dateStr.nullable().optional(),
   minutesSpent,
+  publishDate: dateStr.nullable().optional(),
+  channel: z.enum(CHANNELS).nullable().optional(),
   fileLink: optionalUrl,
 });
 

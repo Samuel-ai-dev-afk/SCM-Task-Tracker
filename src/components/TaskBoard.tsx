@@ -76,8 +76,8 @@ export function TaskBoard({ me }: { me: Me }) {
 
   return (
     <>
-      <div className="px-6 pt-5">
-        <h1 className="font-serif font-bold text-[21px] tracking-[-0.012em] text-ink">
+      <div className="px-6 pt-5 pb-4 header-rule">
+        <h1 className="page-title text-ink">
           {isManager ? "All tasks" : "My tasks"}
         </h1>
         <p className="text-[12.5px] text-muted mt-0.5">
@@ -88,37 +88,30 @@ export function TaskBoard({ me }: { me: Me }) {
       </div>
 
       {/* KPIs */}
-      <div className="flex gap-2.5 px-6 pt-4 flex-wrap">
+      <div className="px-6 pt-4">
+        <div className="bg-card rounded-[14px] shadow-card flex flex-wrap divide-x divide-line2 overflow-hidden">
         {kpis.map(([label, value, warn]) => (
-          <div
-            key={label}
-            className={
-              "bg-card border rounded-lg px-3.5 py-2.5 min-w-[104px] flex-1 shadow-card " +
-              (warn ? "border-burgundy-400 bg-burgundy-50" : "border-line")
-            }
-          >
-            <span
-              className={
-                "block font-mono text-[20px] font-semibold tracking-[-0.02em] " +
-                (warn ? "text-burgundy-600" : "text-ink")
-              }
-            >
+          <div key={label} className="px-4 py-3 min-w-[112px] flex-1">
+            <span className={"metric block " + (warn ? "text-burgundy-600" : "text-ink")}>
               {value}
             </span>
-            <span className="text-[10.5px] text-muted mt-0.5 block">{label}</span>
+            <span className="font-mono text-[10px] tracking-[0.1em] uppercase text-faint mt-1.5 block">
+              {label}
+            </span>
           </div>
         ))}
+        </div>
       </div>
 
       {/* Toolbar */}
       <div className="flex items-center gap-2 px-6 pt-4 pb-3 flex-wrap">
         {isManager && (
           <>
-            <span className="font-mono text-[9.5px] tracking-[0.1em] uppercase text-faint">Person</span>
+            <span className="font-mono text-[10px] tracking-[0.1em] uppercase text-faint">Person</span>
             <select
               value={fWho}
               onChange={(e) => setFWho(e.target.value)}
-              className="text-[13px] bg-field border border-line rounded-md px-2.5 py-1.5"
+              className="text-[13.5px] bg-field border border-line rounded-lg px-2.5 py-1.5"
             >
               <option value="all">Everyone</option>
               {staff.map((u) => (
@@ -127,11 +120,11 @@ export function TaskBoard({ me }: { me: Me }) {
                 </option>
               ))}
             </select>
-            <span className="font-mono text-[9.5px] tracking-[0.1em] uppercase text-faint">Status</span>
+            <span className="font-mono text-[10px] tracking-[0.1em] uppercase text-faint">Status</span>
             <select
               value={fStat}
               onChange={(e) => setFStat(e.target.value)}
-              className="text-[13px] bg-field border border-line rounded-md px-2.5 py-1.5"
+              className="text-[13.5px] bg-field border border-line rounded-lg px-2.5 py-1.5"
             >
               <option value="all">Any</option>
               {STATUSES.map((s) => (
@@ -146,7 +139,7 @@ export function TaskBoard({ me }: { me: Me }) {
         {(
           <button
             onClick={() => setOpenId("new")}
-            className="font-semibold text-[13px] text-white bg-burgundy-600 hover:bg-burgundy-700 rounded-md px-3.5 py-2 transition"
+            className="font-semibold text-[13.5px] text-white bg-burgundy-600 hover:bg-burgundy-700 rounded-lg px-3.5 py-2 transition"
           >
             {isManager ? "+ Assign task" : "+ Add task"}
           </button>
@@ -155,7 +148,7 @@ export function TaskBoard({ me }: { me: Me }) {
 
       {/* Table */}
       <div className="flex-1 md:overflow-auto scroll-quiet px-6 pb-6">
-        <div className="bg-card border border-line rounded-[10px] overflow-hidden shadow-card">
+        <div className="bg-card border border-line rounded-[14px] overflow-hidden shadow-card">
           <table className="w-full border-collapse">
             <thead>
               <tr>
@@ -172,23 +165,23 @@ export function TaskBoard({ me }: { me: Me }) {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={cols} className="py-11 text-center text-faint text-[13px]">
+                  <td colSpan={cols} className="py-11 text-center text-faint text-[13.5px]">
                     Loading…
                   </td>
                 </tr>
               ) : error ? (
                 <tr>
-                  <td colSpan={cols} className="py-11 text-center text-[13px] text-danger-fg">
+                  <td colSpan={cols} className="py-11 text-center text-[13.5px] text-danger-fg">
                     {error}
                   </td>
                 </tr>
               ) : weeks.length === 0 ? (
                 <tr>
                   <td colSpan={cols} className="py-11 px-5 text-center">
-                    <b className="block text-ink text-[14px] mb-1 font-semibold">
+                    <b className="block text-ink text-[15px] mb-1 font-semibold">
                       {isManager ? "Nothing here" : "You're all clear"}
                     </b>
-                    <span className="text-faint text-[13px]">
+                    <span className="text-faint text-[13.5px]">
                       {isManager ? "No tasks match this filter." : "Nothing is assigned to you right now."}
                     </span>
                   </td>
@@ -205,7 +198,7 @@ export function TaskBoard({ me }: { me: Me }) {
             </tbody>
           </table>
         </div>
-        <div className="text-[11px] text-faint pt-3">
+        <div className="text-[11.5px] text-faint pt-3">
           {isManager
             ? "Manager view — you can assign work and manage the team."
             : "You only see tasks assigned to you."}{" "}
@@ -236,7 +229,7 @@ function Th({ children, className = "" }: { children: React.ReactNode; className
   return (
     <th
       className={
-        "bg-subtle text-left px-3.5 py-2.5 font-mono text-[9.5px] font-semibold tracking-[0.1em] uppercase text-faint border-b border-line whitespace-nowrap " +
+        "bg-subtle text-left px-3.5 py-2.5 font-mono text-[10px] font-semibold tracking-[0.1em] uppercase text-faint border-b border-line whitespace-nowrap " +
         className
       }
     >
@@ -253,7 +246,7 @@ function WeekGroup({ week, cols, children }: { week: number; cols: number; child
           <b className="font-mono text-[10px] font-semibold tracking-[0.09em] uppercase text-ink">
             Week {week}
           </b>
-          <span className="text-[11px] text-muted ml-2.5">{weekRange(week)}</span>
+          <span className="text-[11.5px] text-muted ml-2.5">{weekRange(week)}</span>
         </td>
       </tr>
       {children}
@@ -290,16 +283,16 @@ function TaskRow({
           </div>
         </td>
       )}
-      <td className="px-3.5 py-3 align-middle font-mono text-[12px] text-muted hidden md:table-cell">
+      <td className="px-3.5 py-3 align-middle font-mono text-[12.5px] text-muted hidden md:table-cell">
         {shortDate(task.dateAssigned)}
       </td>
-      <td className="px-3.5 py-3 align-middle font-mono text-[12px] text-muted hidden md:table-cell">
+      <td className="px-3.5 py-3 align-middle font-mono text-[12.5px] text-muted hidden md:table-cell">
         {task.deadline ? shortDate(task.deadline) : <span className="text-faint">—</span>}
       </td>
-      <td className="px-3.5 py-3 align-middle font-mono text-[12px] text-muted hidden md:table-cell">
+      <td className="px-3.5 py-3 align-middle font-mono text-[12.5px] text-muted hidden md:table-cell">
         {task.dateCompleted ? shortDate(task.dateCompleted) : <span className="text-faint">—</span>}
       </td>
-      <td className="px-3.5 py-3 align-middle font-mono text-[12px]">
+      <td className="px-3.5 py-3 align-middle font-mono text-[12.5px]">
         {v === null ? (
           <span className="text-faint">—</span>
         ) : (

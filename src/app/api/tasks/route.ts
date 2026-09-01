@@ -55,6 +55,8 @@ export async function POST(req: Request) {
         deadline: input.deadline ? new Date(input.deadline + "T00:00:00Z") : null,
         dateCompleted: input.dateCompleted ? new Date(input.dateCompleted + "T00:00:00Z") : null,
         minutesSpent: input.minutesSpent ?? null,
+        publishDate: input.publishDate ? new Date(input.publishDate + "T00:00:00Z") : null,
+        channel: input.channel ?? null,
         assignedToId,
         // Managers may credit another manager as the assigner; staff logging
         // their own work are always both sides of it.

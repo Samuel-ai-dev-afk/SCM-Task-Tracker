@@ -44,34 +44,34 @@ export default function SignUp() {
     <main className="relative min-h-screen grid place-items-center px-5 py-10 bg-[#0A0F1E] bg-[url('/campus.jpg')] bg-cover bg-center bg-no-repeat">
       {/* Same treatment as the sign-in page so the two feel like one screen. */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#0A0F1E]/30 via-[#0A0F1E]/15 to-[#0A0F1E]/50" />
-      <ThemeToggle className="absolute top-4 right-4 z-10 text-white/70 hover:text-white hover:bg-white/10 rounded-md p-2 leading-none" />
+      <ThemeToggle className="absolute top-4 right-4 z-10 text-white/70 hover:text-white hover:bg-white/10 rounded-lg p-2 leading-none" />
 
-      <div className="relative w-full max-w-[340px] bg-card border border-white/15 rounded-xl shadow-[0_24px_60px_-12px_rgba(0,0,0,.65)] p-7">
-        <div className="font-serif font-bold text-[21px] leading-tight text-ink">
+      <div className="relative w-full max-w-[340px] bg-card border border-white/15 rounded-[16px] shadow-[0_24px_60px_-12px_rgba(0,0,0,.65)] p-7">
+        <div className="font-serif font-bold text-[24px] leading-tight text-ink">
           Strategic Communications
         </div>
-        <div className="font-mono text-[9.5px] tracking-[0.11em] uppercase text-faint mt-1.5 pb-4 mb-4 border-b border-line2">
+        <div className="font-mono text-[10px] tracking-[0.11em] uppercase text-faint mt-1.5 pb-4 mb-4 border-b border-line2">
           Task Tracker · AUS
         </div>
 
         {done ? (
           <>
-            <div className="px-3 py-3 rounded-md bg-ok-bg text-ok-fg text-[12.5px] leading-relaxed">
+            <div className="px-3 py-3 rounded-lg bg-ok-bg text-ok-fg text-[12.5px] leading-relaxed">
               <span className="font-semibold block mb-0.5">Request sent</span>
               Your account is waiting for a manager to approve it. You&apos;ll be able to sign in
               with <span className="font-mono">{email.trim().toLowerCase()}</span> once they do.
             </div>
             <Link
               href="/signin"
-              className="block text-center w-full py-2.5 mt-4 font-semibold text-[13px] text-white bg-burgundy-600 hover:bg-burgundy-700 rounded-md transition"
+              className="block text-center w-full py-2.5 mt-4 font-semibold text-[13.5px] text-white bg-burgundy-600 hover:bg-burgundy-700 rounded-lg transition"
             >
               Back to sign in
             </Link>
           </>
         ) : (
           <>
-            <h1 className="font-serif font-bold text-[16px] text-ink mb-0.5">Create a staff account</h1>
-            <p className="text-[12px] text-muted leading-relaxed mb-4">
+            <h1 className="font-serif font-bold text-[17px] text-ink mb-0.5">Create a staff account</h1>
+            <p className="text-[12.5px] text-muted leading-relaxed mb-4">
               For staff who receive tasks. Manager accounts are set up by a manager on the Team
               page.
             </p>
@@ -84,7 +84,7 @@ export default function SignUp() {
                 placeholder="e.g. Yahya Khan"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full mb-3 text-[13px] bg-field border border-line rounded-md px-3 py-2 focus:border-burgundy-500"
+                className="w-full mb-3 text-[13.5px] bg-field border border-line rounded-lg px-3 py-2 focus:border-burgundy-500"
                 required
               />
 
@@ -95,10 +95,10 @@ export default function SignUp() {
                 placeholder="you@aus.edu"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full mb-1 text-[13px] bg-field border border-line rounded-md px-3 py-2 focus:border-burgundy-500"
+                className="w-full mb-1 text-[13.5px] bg-field border border-line rounded-lg px-3 py-2 focus:border-burgundy-500"
                 required
               />
-              <div className="text-[11px] text-faint mb-3">
+              <div className="text-[11.5px] text-faint mb-3">
                 Must end in <span className="font-mono">@aus.edu</span>.
               </div>
 
@@ -109,7 +109,7 @@ export default function SignUp() {
                 placeholder="At least 8 characters"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full mb-3 text-[13px] bg-field border border-line rounded-md px-3 py-2 focus:border-burgundy-500"
+                className="w-full mb-3 text-[13.5px] bg-field border border-line rounded-lg px-3 py-2 focus:border-burgundy-500"
                 required
               />
 
@@ -120,26 +120,26 @@ export default function SignUp() {
                 placeholder="••••••••"
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
-                className="w-full mb-3 text-[13px] bg-field border border-line rounded-md px-3 py-2 focus:border-burgundy-500"
+                className="w-full mb-3 text-[13.5px] bg-field border border-line rounded-lg px-3 py-2 focus:border-burgundy-500"
                 required
               />
 
               <button
                 type="submit"
                 disabled={busy}
-                className="w-full py-2.5 mt-0.5 font-semibold text-[13px] text-white bg-burgundy-600 hover:bg-burgundy-700 rounded-md transition disabled:opacity-60"
+                className="w-full py-2.5 mt-0.5 font-semibold text-[13.5px] text-white bg-burgundy-600 hover:bg-burgundy-700 rounded-lg transition disabled:opacity-60"
               >
                 {busy ? "Creating account…" : "Create account"}
               </button>
 
               {error && (
-                <div className="mt-3 px-2.5 py-2 rounded-md bg-danger-bg text-danger-fg text-[12px]">
+                <div className="mt-3 px-2.5 py-2 rounded-lg bg-danger-bg text-danger-fg text-[12.5px]">
                   {error}
                 </div>
               )}
             </form>
 
-            <div className="mt-4 pt-3 border-t border-line2 text-center text-[12px] text-muted">
+            <div className="mt-4 pt-3 border-t border-line2 text-center text-[12.5px] text-muted">
               Already have an account?{" "}
               <Link href="/signin" className="font-semibold text-burgundy-600 hover:underline">
                 Sign in
@@ -154,7 +154,7 @@ export default function SignUp() {
 
 function Label({ children }: { children: React.ReactNode }) {
   return (
-    <label className="block font-mono text-[9.5px] tracking-[0.1em] uppercase text-faint mb-1.5">
+    <label className="block font-mono text-[10px] tracking-[0.1em] uppercase text-faint mb-1.5">
       {children}
     </label>
   );

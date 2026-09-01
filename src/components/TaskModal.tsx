@@ -3,8 +3,15 @@
 import { useEffect, useState, useCallback } from "react";
 import { api } from "@/lib/client";
 import { joinMinutes, splitMinutes, formatMinutes } from "@/lib/time";
-import { STATUSES, PILLARS, type Role, type Status } from "@/lib/constants";
-import { weekNumber, weekRange, deadlineVariance, varianceLabel, commentDate } from "@/lib/dates";
+import { STATUSES, PILLARS, CHANNELS, type Role, type Status, type Channel } from "@/lib/constants";
+import {
+  weekNumber,
+  weekRange,
+  deadlineVariance,
+  varianceLabel,
+  commentDate,
+  workingDaysBetween,
+} from "@/lib/dates";
 import { Avatar } from "@/components/ui";
 import type { TaskDTO, UserDTO, CommentDTO } from "@/types";
 
@@ -21,6 +28,8 @@ type Form = {
   dateCompleted: string;
   status: Status;
   fileLink: string;
+  publishDate: string;
+  channel: string;
   // Time logged, kept as two strings while being typed.
   hours: string;
   minutes: string;
@@ -66,6 +75,8 @@ export function TaskModal({
     fileLink: task?.fileLink ?? "",
     hours: splitMinutes(task?.minutesSpent).h,
     minutes: splitMinutes(task?.minutesSpent).m,
+    publishDate: task?.publishDate ?? "",
+    channel: task?.channel ?? "",
   }));
   const [comments, setComments] = useState<CommentDTO[]>(task?.comments ?? []);
   const [newComment, setNewComment] = useState("");
@@ -92,6 +103,8 @@ export function TaskModal({
         dateCompleted: full.dateCompleted ?? "",
         hours: splitMinutes(full.minutesSpent).h,
         minutes: splitMinutes(full.minutesSpent).m,
+        publishDate: full.publishDate ?? "",
+        channel: full.channel ?? "",
         status: full.status,
         fileLink: full.fileLink ?? "",
       }));
@@ -114,6 +127,21 @@ export function TaskModal({
 
   // How early/late the task was finished vs the deadline (same for both roles).
   const variance = deadlineVariance(form.deadline, form.dateCompleted);
+
+  // Working days between finishing and publishing. Before the task is done the
+  // deadline stands in for the finish date, so the figure reads as a plan.
+  const bufferAnchor = form.dateCompleted || form.deadline;
+  const bufferDays = workingDaysBetween(bufferAnchor, form.publishDate);
+  const bufferText = (() => {
+    if (!form.publishDate) return "Not scheduled";
+    if (bufferDays === null) return "Set a deadline to see the buffer";
+    const n = Math.abs(bufferDays);
+    const noun = `${n} working day${n === 1 ? "" : "s"}`;
+    const done = Boolean(form.dateCompleted);
+    if (bufferDays < 0) return done ? `Finished ${noun} after it went live` : `Due ${noun} after it publishes`;
+    if (bufferDays === 0) return done ? "Finished the day it goes live" : "No room \u2014 due the day it publishes";
+    return done ? `Finished with ${noun} to spare` : `${noun} of buffer before it goes live`;
+  })();
 
   const fromName =
     managers.find((u) => u.id === form.assignedFromId)?.name ??
@@ -141,6 +169,8 @@ export function TaskModal({
           deadline: form.deadline || null,
           dateCompleted: form.dateCompleted || null,
           minutesSpent: joinMinutes(form.hours, form.minutes),
+          publishDate: form.publishDate || null,
+          channel: (form.channel || null) as Channel | null,
           fileLink: form.fileLink.trim() || "",
         });
       } else if (task) {
@@ -156,6 +186,8 @@ export function TaskModal({
               deadline: form.deadline || null,
               dateCompleted: form.dateCompleted || null,
               minutesSpent: joinMinutes(form.hours, form.minutes),
+              publishDate: form.publishDate || null,
+              channel: (form.channel || null) as Channel | null,
               fileLink: form.fileLink.trim() || "",
             }
           : {
@@ -204,20 +236,20 @@ export function TaskModal({
   return (
     <>
       <div className="fixed inset-0 bg-overlay z-50" onClick={onClose} />
-      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(500px,94vw)] max-h-[88vh] z-[51] bg-card rounded-xl shadow-modal flex flex-col overflow-hidden animate-pop">
+      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(500px,94vw)] max-h-[88vh] z-[51] bg-card rounded-[16px] shadow-modal flex flex-col overflow-hidden animate-pop">
         {/* Header */}
         <div className="px-[18px] py-[15px] border-b border-line flex items-start gap-2.5">
           <div className="flex-1 min-w-0">
-            <span className="font-mono text-[9px] tracking-[0.1em] uppercase text-faint block mb-1">
+            <span className="font-mono text-[10px] tracking-[0.1em] uppercase text-faint block mb-1">
               {isNew ? (isManager ? "New assignment" : "New task") : `Week ${w} · ${weekRange(w)}`}
             </span>
-            <h3 className="font-serif font-bold text-[16px] leading-tight text-ink">
+            <h3 className="font-serif font-bold text-[17px] leading-tight text-ink">
               {isNew ? (isManager ? "Assign a task" : "Add a task") : form.title || task?.title}
             </h3>
           </div>
           <button
             onClick={onClose}
-            className="text-faint hover:text-ink hover:bg-line2 rounded px-1.5 py-0.5 text-[19px] leading-none"
+            className="text-faint hover:text-ink hover:bg-line2 rounded px-1.5 py-0.5 text-[18px] leading-none"
           >
             ×
           </button>
@@ -231,7 +263,7 @@ export function TaskModal({
                 value={form.title}
                 onChange={(e) => set("title", e.target.value)}
                 placeholder="What needs doing?"
-                className="w-full text-[13px] bg-field border border-line rounded-md px-2.5 py-2"
+                className="w-full text-[13.5px] bg-field border border-line rounded-lg px-2.5 py-2"
               />
             </Field>
           )}
@@ -242,7 +274,7 @@ export function TaskModal({
                 <select
                   value={form.assignedFromId}
                   onChange={(e) => set("assignedFromId", e.target.value)}
-                  className="w-full text-[13px] bg-field border border-line rounded-md px-2.5 py-2"
+                  className="w-full text-[13.5px] bg-field border border-line rounded-lg px-2.5 py-2"
                 >
                   {managers.map((u) => (
                     <option key={u.id} value={u.id}>
@@ -259,7 +291,7 @@ export function TaskModal({
                 <select
                   value={form.assignedToId}
                   onChange={(e) => set("assignedToId", e.target.value)}
-                  className="w-full text-[13px] bg-field border border-line rounded-md px-2.5 py-2"
+                  className="w-full text-[13.5px] bg-field border border-line rounded-lg px-2.5 py-2"
                 >
                   {staff.map((u) => (
                     <option key={u.id} value={u.id}>
@@ -279,7 +311,7 @@ export function TaskModal({
                 value={form.description}
                 onChange={(e) => set("description", e.target.value)}
                 placeholder="Describe the work…"
-                className="w-full min-h-[64px] text-[13px] bg-field border border-line rounded-md px-2.5 py-2 leading-relaxed resize-y"
+                className="w-full min-h-[64px] text-[13.5px] bg-field border border-line rounded-lg px-2.5 py-2 leading-relaxed resize-y"
               />
             ) : (
               <ReadOnly>{form.description || <span className="text-faint">No description.</span>}</ReadOnly>
@@ -291,7 +323,7 @@ export function TaskModal({
               <select
                 value={form.strategicPillar}
                 onChange={(e) => set("strategicPillar", e.target.value)}
-                className="w-full text-[13px] bg-field border border-line rounded-md px-2.5 py-2"
+                className="w-full text-[13.5px] bg-field border border-line rounded-lg px-2.5 py-2"
               >
                 <option value="">— none —</option>
                 {PILLARS.map((p) => (
@@ -312,7 +344,7 @@ export function TaskModal({
                   type="date"
                   value={form.dateAssigned}
                   onChange={(e) => set("dateAssigned", e.target.value)}
-                  className="w-full text-[13px] bg-field border border-line rounded-md px-2.5 py-2"
+                  className="w-full text-[13.5px] bg-field border border-line rounded-lg px-2.5 py-2"
                 />
               ) : (
                 <ReadOnly mono>{form.dateAssigned || "—"}</ReadOnly>
@@ -324,7 +356,7 @@ export function TaskModal({
                   type="date"
                   value={form.deadline}
                   onChange={(e) => set("deadline", e.target.value)}
-                  className="w-full text-[13px] bg-field border border-line rounded-md px-2.5 py-2"
+                  className="w-full text-[13.5px] bg-field border border-line rounded-lg px-2.5 py-2"
                 />
               ) : (
                 <ReadOnly mono>{form.deadline || <span className="text-faint">Not set</span>}</ReadOnly>
@@ -332,9 +364,49 @@ export function TaskModal({
             </Field>
           </div>
 
+          <div className="flex gap-2.5">
+            <Field label="Goes live" className="flex-1 min-w-0">
+              {canEdit ? (
+                <input
+                  type="date"
+                  value={form.publishDate}
+                  onChange={(e) => set("publishDate", e.target.value)}
+                  className="w-full text-[13.5px] bg-field border border-line rounded-lg px-2.5 py-2"
+                />
+              ) : (
+                <ReadOnly mono>{form.publishDate || "Not scheduled"}</ReadOnly>
+              )}
+            </Field>
+            <Field label="Channel" className="flex-1 min-w-0">
+              {canEdit ? (
+                <select
+                  value={form.channel}
+                  onChange={(e) => set("channel", e.target.value)}
+                  className="w-full text-[13.5px] bg-field border border-line rounded-lg px-2.5 py-2"
+                >
+                  <option value="">— none —</option>
+                  {CHANNELS.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <ReadOnly>{form.channel || <span className="text-faint">—</span>}</ReadOnly>
+              )}
+            </Field>
+          </div>
+
+          {/* How much room there is between finishing and going live. */}
+          {form.publishDate && (
+            <Field label="Buffer">
+              <ReadOnly>{bufferText}</ReadOnly>
+            </Field>
+          )}
+
           {/* Time logged — the figure the Hours report totals up. */}
-          <div className="mb-3 bg-subtle border border-line2 rounded-lg px-3.5 py-3">
-            <span className="block font-mono text-[9.5px] tracking-[0.1em] uppercase text-faint mb-2">
+          <div className="mb-3 bg-subtle border border-line2 rounded-[10px] px-3.5 py-3">
+            <span className="block font-mono text-[10px] tracking-[0.1em] uppercase text-faint mb-2">
               Time spent on this task
             </span>
             <div className="flex items-end gap-2.5">
@@ -343,9 +415,9 @@ export function TaskModal({
                   type="number" min={0} inputMode="numeric" placeholder="0"
                   value={form.hours}
                   onChange={(e) => set("hours", e.target.value)}
-                  className="w-full text-center font-mono text-[15px] font-semibold bg-field border border-line rounded-md px-2 py-2"
+                  className="w-full text-center font-mono text-[15px] font-semibold bg-field border border-line rounded-lg px-2 py-2"
                 />
-                <div className="text-[10.5px] text-faint text-center mt-1">Hours</div>
+                <div className="text-[10px] text-faint text-center mt-1">Hours</div>
               </div>
               <div className="text-[17px] text-faint pb-6">:</div>
               <div className="w-[88px]">
@@ -353,9 +425,9 @@ export function TaskModal({
                   type="number" min={0} max={59} inputMode="numeric" placeholder="0"
                   value={form.minutes}
                   onChange={(e) => set("minutes", e.target.value)}
-                  className="w-full text-center font-mono text-[15px] font-semibold bg-field border border-line rounded-md px-2 py-2"
+                  className="w-full text-center font-mono text-[15px] font-semibold bg-field border border-line rounded-lg px-2 py-2"
                 />
-                <div className="text-[10.5px] text-faint text-center mt-1">Minutes</div>
+                <div className="text-[10px] text-faint text-center mt-1">Minutes</div>
               </div>
               <div className="flex-1 pb-6 text-[11.5px] text-muted leading-relaxed">
                 {form.hours || form.minutes ? (
@@ -379,14 +451,14 @@ export function TaskModal({
                 type="date"
                 value={form.dateCompleted}
                 onChange={(e) => set("dateCompleted", e.target.value)}
-                className="w-full text-[13px] bg-field border border-line rounded-md px-2.5 py-2"
+                className="w-full text-[13.5px] bg-field border border-line rounded-lg px-2.5 py-2"
               />
             </Field>
             <Field label="Status" className="flex-1 min-w-0">
               <select
                 value={form.status}
                 onChange={(e) => set("status", e.target.value as Status)}
-                className="w-full text-[13px] bg-field border border-line rounded-md px-2.5 py-2"
+                className="w-full text-[13.5px] bg-field border border-line rounded-lg px-2.5 py-2"
               >
                 {STATUSES.map((s) => (
                   <option key={s} value={s}>
@@ -400,7 +472,7 @@ export function TaskModal({
           <Field label="Vs deadline">
             <div
               className={
-                "font-mono text-[12px] px-2.5 py-2.5 rounded-md text-center " +
+                "font-mono text-[12.5px] px-2.5 py-2.5 rounded-lg text-center " +
                 (variance !== null
                   ? variance > 0
                     ? "bg-burgundy-600 text-white"
@@ -425,7 +497,7 @@ export function TaskModal({
               value={form.fileLink}
               onChange={(e) => set("fileLink", e.target.value)}
               placeholder="Paste a Drive, Canva, or Dropbox link"
-              className="w-full text-[13px] bg-field border border-line rounded-md px-2.5 py-2"
+              className="w-full text-[13.5px] bg-field border border-line rounded-lg px-2.5 py-2"
             />
           </Field>
           {form.fileLink && (
@@ -433,7 +505,7 @@ export function TaskModal({
               href={form.fileLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-[12.5px] text-burgundy-600 font-semibold border border-line rounded-md px-2.5 py-1.5 hover:bg-line2 mb-1"
+              className="inline-flex items-center gap-1.5 text-[12.5px] text-burgundy-600 font-semibold border border-line rounded-lg px-2.5 py-1.5 hover:bg-line2 mb-1"
             >
               ↗ Open the file
             </a>
@@ -442,11 +514,11 @@ export function TaskModal({
           {/* Comments */}
           {!isNew && task && (
             <div className="border-t border-line mt-4 pt-3.5">
-              <h4 className="font-mono text-[9.5px] tracking-[0.1em] uppercase text-faint mb-3">
+              <h4 className="font-mono text-[10px] tracking-[0.1em] uppercase text-faint mb-3">
                 Comments · {comments.length}
               </h4>
               {comments.length === 0 ? (
-                <div className="text-[12px] text-faint pb-2">No comments yet.</div>
+                <div className="text-[12.5px] text-faint pb-2">No comments yet.</div>
               ) : (
                 comments.map((c) => (
                   <div key={c.id} className="flex gap-2.5 mb-3">
@@ -469,11 +541,11 @@ export function TaskModal({
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 placeholder="Leave a note for the team…"
-                className="w-full min-h-[56px] text-[13px] bg-field border border-line rounded-md px-2.5 py-2 resize-y"
+                className="w-full min-h-[56px] text-[13.5px] bg-field border border-line rounded-lg px-2.5 py-2 resize-y"
               />
               <button
                 onClick={postComment}
-                className="mt-1.5 font-semibold text-[12px] border border-line rounded-md px-2.5 py-1.5 hover:bg-line2"
+                className="mt-1.5 font-semibold text-[12.5px] border border-line rounded-lg px-2.5 py-1.5 hover:bg-line2"
               >
                 Post comment
               </button>
@@ -481,7 +553,7 @@ export function TaskModal({
           )}
 
           {error && (
-            <div className="mt-3 px-2.5 py-2 rounded-md bg-danger-bg text-danger-fg text-[12px]">{error}</div>
+            <div className="mt-3 px-2.5 py-2 rounded-lg bg-danger-bg text-danger-fg text-[12.5px]">{error}</div>
           )}
         </div>
 
@@ -490,7 +562,7 @@ export function TaskModal({
           <button
             onClick={save}
             disabled={busy}
-            className="font-semibold text-[13px] text-white bg-burgundy-600 hover:bg-burgundy-700 rounded-md px-3.5 py-2 transition disabled:opacity-60"
+            className="font-semibold text-[13.5px] text-white bg-burgundy-600 hover:bg-burgundy-700 rounded-lg px-3.5 py-2 transition disabled:opacity-60"
           >
             {isNew ? (isManager ? "Assign task" : "Add task") : "Save changes"}
           </button>
@@ -498,7 +570,7 @@ export function TaskModal({
             <button
               onClick={remove}
               disabled={busy}
-              className="font-semibold text-[13px] text-danger-fg border border-danger-line rounded-md px-3.5 py-2 hover:bg-danger-bg transition"
+              className="font-semibold text-[13.5px] text-danger-fg border border-danger-line rounded-lg px-3.5 py-2 hover:bg-danger-bg transition"
             >
               Delete
             </button>
@@ -506,7 +578,7 @@ export function TaskModal({
           <div className="flex-1" />
           <button
             onClick={onClose}
-            className="font-semibold text-[13px] border border-line rounded-md px-3.5 py-2 hover:bg-line2"
+            className="font-semibold text-[13.5px] border border-line rounded-lg px-3.5 py-2 hover:bg-line2"
           >
             Cancel
           </button>
@@ -527,7 +599,7 @@ function Field({
 }) {
   return (
     <div className={"mb-3 " + className}>
-      <label className="block font-mono text-[9.5px] tracking-[0.1em] uppercase text-faint mb-1.5">
+      <label className="block font-mono text-[10px] tracking-[0.1em] uppercase text-faint mb-1.5">
         {label}
       </label>
       {children}
@@ -539,7 +611,7 @@ function ReadOnly({ children, mono = false }: { children: React.ReactNode; mono?
   return (
     <div
       className={
-        "px-2.5 py-2 bg-subtle border border-line2 rounded-md text-[13px] min-h-[35px] leading-normal " +
+        "px-2.5 py-2 bg-subtle border border-line2 rounded-lg text-[13.5px] min-h-[35px] leading-normal " +
         (mono ? "font-mono" : "")
       }
     >

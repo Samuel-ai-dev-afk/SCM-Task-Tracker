@@ -89,10 +89,10 @@ export function Analytics() {
   }, [tasks, users]);
 
   if (loading) {
-    return <div className="p-6 text-[13px] text-faint">Loading analytics…</div>;
+    return <div className="p-6 text-[13.5px] text-faint">Loading analytics…</div>;
   }
   if (error) {
-    return <div className="p-6 text-[13px] text-danger-fg">{error}</div>;
+    return <div className="p-6 text-[13.5px] text-danger-fg">{error}</div>;
   }
 
   const kpis: [string, string | number, boolean][] = [
@@ -107,34 +107,27 @@ export function Analytics() {
 
   return (
     <>
-      <div className="px-6 pt-5">
-        <h1 className="font-bold text-[21px] tracking-[-0.012em] text-ink">Analytics</h1>
+      <div className="px-6 pt-5 pb-4 header-rule">
+        <h1 className="page-title text-ink">Analytics</h1>
         <p className="text-[12.5px] text-muted mt-0.5">
           How the department&apos;s work is distributed and how it&apos;s tracking against deadlines.
         </p>
       </div>
 
       {/* KPI row */}
-      <div className="flex gap-2.5 px-6 pt-4 flex-wrap">
+      <div className="px-6 pt-4">
+        <div className="bg-card rounded-[14px] shadow-card flex flex-wrap divide-x divide-line2 overflow-hidden">
         {kpis.map(([label, value, warn]) => (
-          <div
-            key={label}
-            className={
-              "bg-card border rounded-lg px-3.5 py-2.5 min-w-[110px] flex-1 shadow-card " +
-              (warn ? "border-burgundy-400 bg-burgundy-50" : "border-line")
-            }
-          >
-            <span
-              className={
-                "block text-[20px] font-semibold tracking-[-0.02em] " +
-                (warn ? "text-burgundy-600" : "text-ink")
-              }
-            >
+          <div key={label} className="px-4 py-3 min-w-[112px] flex-1">
+            <span className={"metric block " + (warn ? "text-burgundy-600" : "text-ink")}>
               {value}
             </span>
-            <span className="text-[10.5px] text-muted mt-0.5 block">{label}</span>
+            <span className="font-mono text-[10px] tracking-[0.1em] uppercase text-faint mt-1.5 block">
+              {label}
+            </span>
           </div>
         ))}
+        </div>
       </div>
 
       <div className="flex-1 md:overflow-auto scroll-quiet px-6 pb-8 pt-5">
@@ -224,7 +217,7 @@ export function Analytics() {
 
 function Panel({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-card border border-line rounded-[10px] shadow-card p-4">
+    <div className="bg-card border border-line rounded-[14px] shadow-card p-4">
       <h2 className="text-[10px] font-semibold tracking-[0.1em] uppercase text-faint mb-3.5">{title}</h2>
       <div className="flex flex-col gap-2.5">{children}</div>
     </div>
@@ -250,7 +243,7 @@ function Bar({
   return (
     <div className="flex items-center gap-3">
       <div className="w-[120px] shrink-0 min-w-0">
-        <div className="text-[12px] text-ink truncate" title={label}>
+        <div className="text-[12.5px] text-ink truncate" title={label}>
           {label}
         </div>
         {sub && <div className="text-[10px] text-faint truncate">{sub}</div>}
@@ -261,7 +254,7 @@ function Bar({
           style={{ width: `${pct}%`, background: color, minWidth: value > 0 ? 4 : 0 }}
         />
       </div>
-      <div className="w-[92px] shrink-0 text-right text-[11px] text-muted">
+      <div className="w-[92px] shrink-0 text-right text-[11.5px] text-muted">
         <span className="font-semibold text-ink">{value}</span>
         {suffix ? ` ${suffix}` : ""}
       </div>
@@ -270,5 +263,5 @@ function Bar({
 }
 
 function Empty() {
-  return <div className="text-[12px] text-faint py-2">No data yet.</div>;
+  return <div className="text-[12.5px] text-faint py-2">No data yet.</div>;
 }

@@ -19,8 +19,8 @@ export function Settings({ me }: { me: Me }) {
 
   return (
     <>
-      <div className="px-6 pt-5">
-        <h1 className="font-serif font-bold text-[21px] tracking-[-0.012em] text-ink">Settings</h1>
+      <div className="px-6 pt-5 pb-4 header-rule">
+        <h1 className="page-title text-ink">Settings</h1>
         <p className="text-[12.5px] text-muted mt-0.5">
           Your account and how the tracker looks for you.
         </p>
@@ -72,14 +72,14 @@ function ProfileSection({ me }: { me: Me }) {
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full text-[13px] bg-field border border-line rounded-md px-2.5 py-2 focus:border-burgundy-500"
+              className="w-full text-[13.5px] bg-field border border-line rounded-lg px-2.5 py-2 focus:border-burgundy-500"
               required
             />
           </div>
         </div>
         <button
           type="submit" disabled={busy || !name.trim() || name.trim() === me.name}
-          className="font-semibold text-[13px] text-white bg-burgundy-600 hover:bg-burgundy-700 rounded-md px-3.5 py-2 disabled:opacity-50"
+          className="font-semibold text-[13.5px] text-white bg-burgundy-600 hover:bg-burgundy-700 rounded-lg px-3.5 py-2 disabled:opacity-50"
         >
           {busy ? "Saving…" : "Save name"}
         </button>
@@ -144,14 +144,14 @@ function AppearanceSection() {
 
   return (
     <Section title="Appearance" desc="Applies on this device.">
-      <div className="inline-flex border border-line rounded-lg overflow-hidden">
+      <div className="inline-flex border border-line rounded-[10px] overflow-hidden">
         {CHOICES.map((c) => {
           const on = ready && choice === c.value;
           return (
             <button
               key={c.value} onClick={() => pick(c.value)} type="button"
               className={
-                "px-4 py-2 text-[13px] transition " +
+                "px-4 py-2 text-[13.5px] transition " +
                 (on ? "bg-burgundy-600 text-white font-semibold" : "text-muted hover:bg-line2")
               }
             >
@@ -205,21 +205,21 @@ function PasswordSection({ me }: { me: Me }) {
         <Field label="Current password">
           <input type="password" autoComplete="current-password" value={current}
             onChange={(e) => setCurrent(e.target.value)} required
-            className="w-full text-[13px] bg-field border border-line rounded-md px-2.5 py-2 focus:border-burgundy-500" />
+            className="w-full text-[13.5px] bg-field border border-line rounded-lg px-2.5 py-2 focus:border-burgundy-500" />
         </Field>
         <Field label="New password" hint="At least 8 characters.">
           <input type="password" autoComplete="new-password" value={next}
             onChange={(e) => setNext(e.target.value)} required
-            className="w-full text-[13px] bg-field border border-line rounded-md px-2.5 py-2 focus:border-burgundy-500" />
+            className="w-full text-[13.5px] bg-field border border-line rounded-lg px-2.5 py-2 focus:border-burgundy-500" />
         </Field>
         <Field label="Confirm new password">
           <input type="password" autoComplete="new-password" value={confirm}
             onChange={(e) => setConfirm(e.target.value)} required
-            className="w-full text-[13px] bg-field border border-line rounded-md px-2.5 py-2 focus:border-burgundy-500" />
+            className="w-full text-[13.5px] bg-field border border-line rounded-lg px-2.5 py-2 focus:border-burgundy-500" />
         </Field>
 
         <button type="submit" disabled={busy}
-          className="font-semibold text-[13px] text-white bg-burgundy-600 hover:bg-burgundy-700 rounded-md px-3.5 py-2 disabled:opacity-60">
+          className="font-semibold text-[13.5px] text-white bg-burgundy-600 hover:bg-burgundy-700 rounded-lg px-3.5 py-2 disabled:opacity-60">
           {busy ? "Saving…" : "Change password"}
         </button>
         <div className="text-[11.5px] text-faint mt-2.5">
@@ -235,10 +235,10 @@ function PasswordSection({ me }: { me: Me }) {
 
 function Section({ title, desc, children }: { title: string; desc: string; children: React.ReactNode }) {
   return (
-    <div className="bg-card border border-line rounded-[10px] shadow-card overflow-hidden mb-3.5">
+    <div className="bg-card border border-line rounded-[14px] shadow-card overflow-hidden mb-3.5">
       <div className="px-4 py-3 border-b border-line">
-        <div className="text-[14.5px] font-bold text-ink">{title}</div>
-        <div className="text-[12px] text-muted mt-0.5">{desc}</div>
+        <div className="text-[15px] font-bold text-ink">{title}</div>
+        <div className="text-[12.5px] text-muted mt-0.5">{desc}</div>
       </div>
       <div className="px-4 py-4">{children}</div>
     </div>
@@ -247,7 +247,7 @@ function Section({ title, desc, children }: { title: string; desc: string; child
 
 function Label({ children }: { children: React.ReactNode }) {
   return (
-    <span className="block font-mono text-[9.5px] tracking-[0.1em] uppercase text-faint mb-1.5">
+    <span className="block font-mono text-[10px] tracking-[0.1em] uppercase text-faint mb-1.5">
       {children}
     </span>
   );
@@ -268,7 +268,7 @@ function Note({ ok, bad }: { ok: string; bad: string }) {
   return (
     <div
       className={
-        "mt-3 px-2.5 py-2 rounded-md text-[12px] " +
+        "mt-3 px-2.5 py-2 rounded-lg text-[12.5px] " +
         (bad ? "bg-danger-bg text-danger-fg" : "bg-ok-bg text-ok-fg")
       }
     >

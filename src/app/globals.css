@@ -144,6 +144,49 @@ textarea:focus-visible {
   color: var(--c-ink);
 }
 
+/*
+  The "mono" role is Roboto with tabular figures rather than a monospace face.
+  Dates, hours and counts sit in columns all over this app, and proportional
+  digits make those columns wobble. The uppercase tracking is what gives labels
+  their character — the face itself never needed to change.
+*/
+.font-mono {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* Page titles: tight and set in the display role. */
+.page-title {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.018em;
+  line-height: 1.15;
+}
+
+/*
+  Metrics are the signature. Everything in this tracker is a question about
+  time — hours logged, days of buffer, turnaround — so the numbers are the
+  content. Set light and large with tabular figures they read as precise
+  rather than shouted, and they line up down a column.
+*/
+.metric {
+  font-size: 28px;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/*
+  A single hairline separating the page header from its content. An accent mark
+  was tried here and cut: sitting under the subtitle it read as a stray
+  underline, and the burgundy sidebar already carries the brand.
+*/
+.header-rule {
+  border-bottom: 1px solid var(--c-line);
+}
+
 /* Native date pickers, styled to match the mono treatment. */
 input[type="date"] {
   font-family: var(--font-mono), ui-monospace, monospace;

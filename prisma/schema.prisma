@@ -52,6 +52,13 @@ model Task {
   // Time the assignee logged against this task, in whole minutes. Null = not
   // recorded yet. Stored as minutes so hour/minute maths stays exact.
   minutesSpent    Int?
+  // When this goes live. Distinct from `deadline`: the deadline is when the
+  // work is due internally, the publish date is when the audience sees it, and
+  // the gap between them is the buffer.
+  publishDate     DateTime?
+  // Where it goes live. Free-form on purpose — validated against CHANNELS in
+  // the app layer, same approach as status and pillar.
+  channel         String?
   dateAssigned    DateTime
   deadline        DateTime?
   dateCompleted   DateTime?
@@ -71,6 +78,7 @@ model Task {
   @@index([dateAssigned])
   @@index([deadline])
   @@index([dateCompleted])
+  @@index([publishDate])
 }
 
 model Comment {
