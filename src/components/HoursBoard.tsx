@@ -32,7 +32,10 @@ export function HoursBoard({ me }: { me: Me }) {
 
   useEffect(() => {
     if (!isManager) return;
-    api.get("/api/users").then(setStaff).catch(() => setStaff([]));
+    // Only the staff being tracked — managers assign work rather than log it.
+    api.get("/api/users")
+      .then((all: UserDTO[]) => setStaff(all.filter((u) => u.role === "staff")))
+      .catch(() => setStaff([]));
   }, [isManager]);
 
   const load = useCallback(async () => {

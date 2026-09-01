@@ -37,6 +37,7 @@ export async function POST(req: Request) {
     const input = createTaskSchema.parse(await req.json());
 
     const assignedToId = isManager(user) ? input.assignedToId : user.id;
+    if (!assignedToId) throw new HttpError(400, "Choose who this is for.");
 
     const assignee = await prisma.user.findFirst({
       where: { id: assignedToId, active: true },
