@@ -7,6 +7,15 @@ import { signOut } from "next-auth/react";
 import { Avatar } from "@/components/ui";
 import { DefaultPasswordBanner } from "@/components/ChangePassword";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import {
+  IconTasks,
+  IconTeam,
+  IconAnalytics,
+  IconCalendar,
+  IconHours,
+  IconSettings,
+  IconPower,
+} from "@/components/icons";
 import type { Role } from "@/lib/constants";
 
 type Me = { id: string; name: string; email: string; role: Role };
@@ -19,16 +28,16 @@ export function Shell({ me, children }: { me: Me; children: React.ReactNode }) {
   const [passwordVersion] = useState(0);
 
   const nav = [
-    { href: "/tasks", label: isManager ? "All tasks" : "My tasks", icon: "▤" },
+    { href: "/tasks", label: isManager ? "All tasks" : "My tasks", Icon: IconTasks },
     ...(isManager
       ? [
-          { href: "/team", label: "Team", icon: "◍" },
-          { href: "/analytics", label: "Analytics", icon: "▦" },
+          { href: "/team", label: "Team", Icon: IconTeam },
+          { href: "/analytics", label: "Analytics", Icon: IconAnalytics },
         ]
       : []),
-    { href: "/calendar", label: "Calendar", icon: "▢" },
-    { href: "/hours", label: "Hours", icon: "◷" },
-    { href: "/settings", label: "Settings", icon: "⚙" },
+    { href: "/calendar", label: "Calendar", Icon: IconCalendar },
+    { href: "/hours", label: "Hours", Icon: IconHours },
+    { href: "/settings", label: "Settings", Icon: IconSettings },
   ];
 
   return (
@@ -56,7 +65,7 @@ export function Shell({ me, children }: { me: Me; children: React.ReactNode }) {
                     : "text-white/70 hover:bg-white/10 hover:text-white font-medium")
                 }
               >
-                <span className="text-[15px] opacity-85 w-4 text-center">{n.icon}</span>
+                <n.Icon size={17} className={on ? "opacity-100" : "opacity-70"} />
                 {n.label}
               </Link>
             );

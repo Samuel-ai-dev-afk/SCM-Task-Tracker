@@ -13,6 +13,13 @@ import {
 } from "@/lib/constants";
 import { shortDate, workingDaysBetween } from "@/lib/dates";
 import type { CalendarEntryDTO } from "@/types";
+import {
+  IconChevronLeft,
+  IconChevronRight,
+  IconClose,
+  IconPlus,
+  IconCalendarEmpty,
+} from "@/components/icons";
 
 type TaskItem = {
   id: string;
@@ -24,6 +31,9 @@ type TaskItem = {
   dateCompleted: string | null;
   assignedToId: string;
   assignedToName: string;
+  // False when the viewer isn't allowed the buffer for this task — the server
+  // withholds the dates it's derived from, so there is nothing to compute.
+  showBuffer?: boolean;
 };
 
 type Me = { id: string; name: string; role: "manager" | "staff" };
@@ -173,10 +183,14 @@ export function CalendarBoard({ me }: { me: Me }) {
       <div className="flex-1 md:overflow-auto scroll-quiet px-6 pt-4 pb-6">
         <div className="bg-card border border-line rounded-[14px] shadow-card px-3.5 py-2.5 mb-3.5 flex flex-wrap items-center gap-2">
           <button onClick={() => shift(-1)} aria-label="Previous month"
-            className="text-[18px] leading-none text-muted hover:text-ink border border-line rounded-lg px-2.5 py-1.5">‹</button>
+            className="grid place-items-center text-muted hover:text-ink hover:bg-line2 border border-line rounded-lg w-9 h-9 transition-colors cursor-pointer">
+            <IconChevronLeft size={17} />
+          </button>
           <div className="font-semibold text-[15px] text-ink min-w-[150px] text-center">{monthLabel}</div>
           <button onClick={() => shift(1)} aria-label="Next month"
-            className="text-[18px] leading-none text-muted hover:text-ink border border-line rounded-lg px-2.5 py-1.5">›</button>
+            className="grid place-items-center text-muted hover:text-ink hover:bg-line2 border border-line rounded-lg w-9 h-9 transition-colors cursor-pointer">
+            <IconChevronRight size={17} />
+          </button>
           <button
             onClick={() => { setSelected(null); setCursor({ y: today.getFullYear(), m: today.getMonth() }); }}
             className="text-[12.5px] border border-line rounded-lg px-2.5 py-1.5 text-muted hover:bg-line2 hover:text-ink"
@@ -242,8 +256,8 @@ export function CalendarBoard({ me }: { me: Me }) {
                           {d.getDate()}
                         </span>
                         {isManager && (
-                          <span className="ml-auto text-faint opacity-0 group-hover:opacity-100 text-[13.5px] leading-none pr-0.5">
-                            +
+                          <span className="ml-auto text-faint opacity-0 group-hover:opacity-100 transition-opacity pr-0.5">
+                            <IconPlus size={13} />
                           </span>
                         )}
                       </div>
@@ -301,7 +315,9 @@ export function CalendarBoard({ me }: { me: Me }) {
                 </button>
               )}
               <button onClick={() => setSelected(null)} aria-label="Close"
-                className="text-faint hover:text-ink text-[18px] leading-none px-1">×</button>
+                className="grid place-items-center text-faint hover:text-ink w-7 h-7 rounded-lg hover:bg-line2 transition-colors cursor-pointer">
+                <IconClose size={15} />
+              </button>
             </div>
 
             {selectedEntries.length === 0 && selectedTasks.length === 0 && (
@@ -354,8 +370,10 @@ export function CalendarBoard({ me }: { me: Me }) {
                   <div className="flex-1 min-w-[220px]">
                     <div className="font-semibold text-[13.5px] text-ink">{t.title}</div>
                     <div className="text-[11.5px] text-muted mt-0.5">
-                      {t.channel ?? "No channel"} · deadline{" "}
-                      {t.deadline ? shortDate(t.deadline) : "not set"}
+                      {t.channel ?? "No channel"}
+                      {t.showBuffer !== false && (
+                        <> · deadline {t.deadline ? shortDate(t.deadline) : "not set"}</>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -364,13 +382,39 @@ export function CalendarBoard({ me }: { me: Me }) {
                       {t.assignedToId === me.id ? "You" : t.assignedToName}
                     </span>
                   </div>
-                  <span className={"text-[11.5px] font-semibold px-2 py-1 rounded-lg whitespace-nowrap " + tone}>
-                    {b.text}
-                  </span>
+                  {t.showBuffer !== false && (
+                    <span className={"text-[11.5px] font-semibold px-2 py-1 rounded-lg whitespace-nowrap " + tone}>
+                      {b.text}
+                    </span>
+                  )}
                   <StatusPill status={t.status} />
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {!loading && !error && scheduled === 0 && (
+          <div className="mt-3.5 bg-card border border-line rounded-[14px] shadow-card px-6 py-10 text-center">
+            <div className="grid place-items-center text-faint mb-2.5">
+              <IconCalendarEmpty size={26} />
+            </div>
+            <div className="text-[13.5px] font-semibold text-ink">
+              Nothing scheduled in {monthLabel}
+            </div>
+            <div className="text-[12.5px] text-muted mt-1 max-w-[420px] mx-auto leading-relaxed">
+              {isManager
+                ? "Give a task a publish date, or pick a day above to add a meeting, event or reminder."
+                : "Tasks appear here once they have a publish date."}
+            </div>
+            {isManager && (
+              <button
+                onClick={() => setEditing("new")}
+                className="mt-4 font-semibold text-[13.5px] text-white bg-burgundy-600 hover:bg-burgundy-700 rounded-lg px-3.5 py-2"
+              >
+                Add to calendar
+              </button>
+            )}
           </div>
         )}
 

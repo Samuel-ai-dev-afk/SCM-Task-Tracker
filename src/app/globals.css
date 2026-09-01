@@ -125,6 +125,35 @@ body {
   }
 }
 
+/*
+  Pointer affordance. Browsers give <button> a default arrow cursor, so without
+  this every button in the app felt slightly inert on hover. One rule beats
+  adding cursor-pointer to a hundred class lists, and it can't drift.
+*/
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]),
+label[for],
+summary {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
+}
+
+/*
+  Interactive elements settle into their hover state instead of snapping. Kept
+  to colour and opacity — never layout properties — so nothing reflows, and
+  skipped entirely when the viewer asks for reduced motion.
+*/
+@media (prefers-reduced-motion: no-preference) {
+  button,
+  a,
+  [role="button"] {
+    transition: background-color 0.16s ease, color 0.16s ease, border-color 0.16s ease,
+      opacity 0.16s ease;
+  }
+}
+
 /* Visible keyboard focus everywhere. */
 :focus-visible {
   outline: 2px solid var(--c-brand-line);
