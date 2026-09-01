@@ -13,6 +13,16 @@ const optionalUrl = z
   .nullable()
   .optional();
 
+// Time logged against a task, in whole minutes. Capped at 999h so a typo in
+// the hours box can't quietly poison a month's total.
+const minutesSpent = z
+  .number()
+  .int("Use whole minutes.")
+  .min(0, "Time can't be negative.")
+  .max(59940, "That's more than 999 hours — check the hours and minutes.")
+  .nullable()
+  .optional();
+
 export const createTaskSchema = z.object({
   title: z.string().trim().min(1, "Give the task a title.").max(200),
   description: z.string().max(4000).optional().default(""),
@@ -23,6 +33,7 @@ export const createTaskSchema = z.object({
   dateAssigned: dateStr,
   deadline: dateStr.nullable().optional(),
   dateCompleted: dateStr.nullable().optional(),
+  minutesSpent,
   fileLink: optionalUrl,
 });
 
@@ -37,6 +48,7 @@ export const managerPatchSchema = z.object({
   dateAssigned: dateStr.optional(),
   deadline: dateStr.nullable().optional(),
   dateCompleted: dateStr.nullable().optional(),
+  minutesSpent,
   fileLink: optionalUrl,
 });
 
@@ -46,6 +58,8 @@ export const managerPatchSchema = z.object({
 export const staffPatchSchema = z.object({
   status: z.enum(STATUSES).optional(),
   dateCompleted: dateStr.nullable().optional(),
+  // Staff log their own time — that's the whole point of the hours report.
+  minutesSpent,
   fileLink: optionalUrl,
 });
 
@@ -85,6 +99,19 @@ export const signupSchema = z.object({
 // A manager's decision on a pending signup.
 export const approvalSchema = z.object({
   action: z.enum(["approve", "decline"]),
+});
+
+// Editing your own profile. Email and role are deliberately absent: those stay
+// with managers.
+export const updateProfileSchema = z.object({
+  name: z.string().trim().min(1, "Enter a name.").max(120),
+});
+
+// Date range for the hours report.
+export const hoursQuerySchema = z.object({
+  from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid start date."),
+  to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid end date."),
+  userId: z.string().min(1).optional(),
 });
 
 // Changing your own password. The account comes from the session, never the

@@ -21,6 +21,7 @@ export function serializeTask(t: TaskWithRelations): TaskDTO {
     dateAssigned: toDateInput(t.dateAssigned),
     deadline: t.deadline ? toDateInput(t.deadline) : null,
     dateCompleted: t.dateCompleted ? toDateInput(t.dateCompleted) : null,
+    minutesSpent: t.minutesSpent ?? null,
     assignedFromId: t.assignedFromId,
     assignedFromName: t.assignedFrom.name,
     assignedToId: t.assignedToId,

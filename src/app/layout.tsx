@@ -26,9 +26,8 @@ const themeBoot = `
 (function () {
   try {
     var saved = localStorage.getItem("scm.theme");
-    var dark = saved
-      ? saved === "dark"
-      : window.matchMedia("(prefers-color-scheme: dark)").matches;
+    var sys = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    var dark = saved === "dark" || ((!saved || saved === "system") && sys);
     if (dark) document.documentElement.classList.add("dark");
   } catch (e) {}
 })();

@@ -29,6 +29,7 @@ export type TaskDTO = {
   dateAssigned: string; // YYYY-MM-DD
   deadline: string | null; // YYYY-MM-DD (when manager expects completion)
   dateCompleted: string | null; // YYYY-MM-DD (when actually completed)
+  minutesSpent: number | null; // time logged by the assignee, in minutes
   assignedFromId: string;
   assignedFromName: string;
   assignedToId: string;

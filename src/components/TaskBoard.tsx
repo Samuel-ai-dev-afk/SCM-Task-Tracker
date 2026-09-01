@@ -143,12 +143,12 @@ export function TaskBoard({ me }: { me: Me }) {
           </>
         )}
         <div className="flex-1" />
-        {isManager && (
+        {(
           <button
             onClick={() => setOpenId("new")}
             className="font-semibold text-[13px] text-white bg-burgundy-600 hover:bg-burgundy-700 rounded-md px-3.5 py-2 transition"
           >
-            + Assign task
+            {isManager ? "+ Assign task" : "+ Add task"}
           </button>
         )}
       </div>
