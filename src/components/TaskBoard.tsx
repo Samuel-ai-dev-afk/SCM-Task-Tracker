@@ -149,54 +149,59 @@ export function TaskBoard({ me }: { me: Me }) {
       {/* Table */}
       <div className="flex-1 md:overflow-auto scroll-quiet px-6 pb-6">
         <div className="bg-card border border-line rounded-[14px] overflow-hidden shadow-card">
-          <table className="w-full border-collapse">
-            <thead>
-              <tr>
-                <Th>Task</Th>
-                {isManager && <Th>Assigned to</Th>}
-                <Th className="hidden md:table-cell">Assigned</Th>
-                <Th className="hidden md:table-cell">Deadline</Th>
-                <Th className="hidden md:table-cell">Completed</Th>
-                <Th>Vs deadline</Th>
-                <Th>Status</Th>
-                <Th> </Th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
+          {/* The card keeps overflow-hidden so its rounded corners clip cleanly,
+              which also blocks horizontal scrolling — so the table gets its own
+              scroll container. Narrow windows can now reach the last column. */}
+          <div className="overflow-x-auto scroll-quiet">
+            <table className="w-full min-w-[900px] border-collapse">
+              <thead>
                 <tr>
-                  <td colSpan={cols} className="py-11 text-center text-faint text-[13.5px]">
-                    Loading…
-                  </td>
+                  <Th>Task</Th>
+                  {isManager && <Th>Assigned to</Th>}
+                  <Th className="hidden md:table-cell">Assigned</Th>
+                  <Th className="hidden md:table-cell">Deadline</Th>
+                  <Th className="hidden md:table-cell">Completed</Th>
+                  <Th>Vs deadline</Th>
+                  <Th>Status</Th>
+                  <Th> </Th>
                 </tr>
-              ) : error ? (
-                <tr>
-                  <td colSpan={cols} className="py-11 text-center text-[13.5px] text-danger-fg">
-                    {error}
-                  </td>
-                </tr>
-              ) : weeks.length === 0 ? (
-                <tr>
-                  <td colSpan={cols} className="py-11 px-5 text-center">
-                    <b className="block text-ink text-[15px] mb-1 font-semibold">
-                      {isManager ? "Nothing here" : "You're all clear"}
-                    </b>
-                    <span className="text-faint text-[13.5px]">
-                      {isManager ? "No tasks match this filter." : "Nothing is assigned to you right now."}
-                    </span>
-                  </td>
-                </tr>
-              ) : (
-                weeks.map((w) => (
-                  <WeekGroup key={w} week={w} cols={cols}>
-                    {byWeek.get(w)!.map((t) => (
-                      <TaskRow key={t.id} task={t} isManager={isManager} onClick={() => setOpenId(t.id)} />
-                    ))}
-                  </WeekGroup>
-                ))
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan={cols} className="py-11 text-center text-faint text-[13.5px]">
+                      Loading…
+                    </td>
+                  </tr>
+                ) : error ? (
+                  <tr>
+                    <td colSpan={cols} className="py-11 text-center text-[13.5px] text-danger-fg">
+                      {error}
+                    </td>
+                  </tr>
+                ) : weeks.length === 0 ? (
+                  <tr>
+                    <td colSpan={cols} className="py-11 px-5 text-center">
+                      <b className="block text-ink text-[15px] mb-1 font-semibold">
+                        {isManager ? "Nothing here" : "You're all clear"}
+                      </b>
+                      <span className="text-faint text-[13.5px]">
+                        {isManager ? "No tasks match this filter." : "Nothing is assigned to you right now."}
+                      </span>
+                    </td>
+                  </tr>
+                ) : (
+                  weeks.map((w) => (
+                    <WeekGroup key={w} week={w} cols={cols}>
+                      {byWeek.get(w)!.map((t) => (
+                        <TaskRow key={t.id} task={t} isManager={isManager} onClick={() => setOpenId(t.id)} />
+                      ))}
+                    </WeekGroup>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
         <div className="text-[11.5px] text-faint pt-3">
           {isManager

@@ -124,85 +124,92 @@ export function HoursBoard({ me }: { me: Me }) {
             {isManager && (
               <div className="bg-card border border-line rounded-[14px] shadow-card overflow-hidden mb-3.5">
                 <SectionHead title="By person" right={`${shortDate(from)} – ${shortDate(to)}`} />
-                <table className="w-full border-collapse">
+                {/* The card keeps overflow-hidden so its rounded corners clip cleanly,
+              which also blocks horizontal scrolling — so the table gets its own
+              scroll container. Narrow windows can now reach the last column. */}
+                <div className="overflow-x-auto scroll-quiet">
+                  <table className="w-full min-w-[700px] border-collapse">
+                    <thead>
+                      <tr>{["Name", "Tasks", "Hours logged", "Share"].map((h) => <Th key={h}>{h}</Th>)}</tr>
+                    </thead>
+                    <tbody>
+                      {loading ? (
+                        <Empty cols={4}>Loading…</Empty>
+                      ) : !data?.people.length ? (
+                        <Empty cols={4}>No time logged in this period.</Empty>
+                      ) : (
+                        data.people.map((p) => (
+                          <tr key={p.id} className="border-b border-line2 last:border-0">
+                            <td className="px-3.5 py-3">
+                              <div className="flex items-center gap-2.5">
+                                <Avatar name={p.name} size={28} />
+                                <span className="font-semibold text-[13.5px] text-ink">{p.name}</span>
+                              </div>
+                            </td>
+                            <td className="px-3.5 py-3 font-mono text-[13.5px] text-muted">{p.taskCount}</td>
+                            <td className="px-3.5 py-3 font-mono text-[15px] font-semibold text-ink">
+                              {formatMinutes(p.minutes)}
+                            </td>
+                            <td className="px-3.5 py-3">
+                              <div className="w-[110px] h-[5px] bg-line2 rounded overflow-hidden">
+                                <div className="h-full rounded bg-burgundy-600"
+                                  style={{ width: `${Math.round((p.minutes / peak) * 100)}%` }} />
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            <div className="bg-card border border-line rounded-[14px] shadow-card overflow-hidden">
+              <SectionHead title="Task detail" right={`${data?.tasks.length ?? 0} tasks`} />
+              <div className="overflow-x-auto scroll-quiet">
+                <table className="w-full min-w-[700px] border-collapse">
                   <thead>
-                    <tr>{["Name", "Tasks", "Hours logged", "Share"].map((h) => <Th key={h}>{h}</Th>)}</tr>
+                    <tr>
+                      <Th>Task</Th>
+                      {isManager && <Th>Person</Th>}
+                      <Th>Completed</Th>
+                      <Th>Time logged</Th>
+                      <Th>Status</Th>
+                    </tr>
                   </thead>
                   <tbody>
                     {loading ? (
-                      <Empty cols={4}>Loading…</Empty>
-                    ) : !data?.people.length ? (
-                      <Empty cols={4}>No time logged in this period.</Empty>
+                      <Empty cols={isManager ? 5 : 4}>Loading…</Empty>
+                    ) : !data?.tasks.length ? (
+                      <Empty cols={isManager ? 5 : 4}>
+                        Nothing logged between these dates.
+                      </Empty>
                     ) : (
-                      data.people.map((p) => (
-                        <tr key={p.id} className="border-b border-line2 last:border-0">
-                          <td className="px-3.5 py-3">
-                            <div className="flex items-center gap-2.5">
-                              <Avatar name={p.name} size={28} />
-                              <span className="font-semibold text-[13.5px] text-ink">{p.name}</span>
-                            </div>
+                      data.tasks.map((t) => (
+                        <tr key={t.id} className="border-b border-line2 last:border-0">
+                          <td className="px-3.5 py-3 font-semibold text-[13.5px] text-ink">{t.title}</td>
+                          {isManager && (
+                            <td className="px-3.5 py-3">
+                              <div className="flex items-center gap-2">
+                                <Avatar name={t.userName} size={24} />
+                                <span className="text-[12.5px] text-muted">{t.userName}</span>
+                              </div>
+                            </td>
+                          )}
+                          <td className="px-3.5 py-3 font-mono text-[12.5px] text-muted">
+                            {t.dateCompleted ? shortDate(t.dateCompleted) : "—"}
                           </td>
-                          <td className="px-3.5 py-3 font-mono text-[13.5px] text-muted">{p.taskCount}</td>
-                          <td className="px-3.5 py-3 font-mono text-[15px] font-semibold text-ink">
-                            {formatMinutes(p.minutes)}
+                          <td className="px-3.5 py-3 font-mono text-[13.5px] font-semibold text-ink">
+                            {formatMinutes(t.minutesSpent)}
                           </td>
-                          <td className="px-3.5 py-3">
-                            <div className="w-[110px] h-[5px] bg-line2 rounded overflow-hidden">
-                              <div className="h-full rounded bg-burgundy-600"
-                                style={{ width: `${Math.round((p.minutes / peak) * 100)}%` }} />
-                            </div>
-                          </td>
+                          <td className="px-3.5 py-3"><StatusPill status={t.status} /></td>
                         </tr>
                       ))
                     )}
                   </tbody>
                 </table>
               </div>
-            )}
-
-            <div className="bg-card border border-line rounded-[14px] shadow-card overflow-hidden">
-              <SectionHead title="Task detail" right={`${data?.tasks.length ?? 0} tasks`} />
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr>
-                    <Th>Task</Th>
-                    {isManager && <Th>Person</Th>}
-                    <Th>Completed</Th>
-                    <Th>Time logged</Th>
-                    <Th>Status</Th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {loading ? (
-                    <Empty cols={isManager ? 5 : 4}>Loading…</Empty>
-                  ) : !data?.tasks.length ? (
-                    <Empty cols={isManager ? 5 : 4}>
-                      Nothing logged between these dates.
-                    </Empty>
-                  ) : (
-                    data.tasks.map((t) => (
-                      <tr key={t.id} className="border-b border-line2 last:border-0">
-                        <td className="px-3.5 py-3 font-semibold text-[13.5px] text-ink">{t.title}</td>
-                        {isManager && (
-                          <td className="px-3.5 py-3">
-                            <div className="flex items-center gap-2">
-                              <Avatar name={t.userName} size={24} />
-                              <span className="text-[12.5px] text-muted">{t.userName}</span>
-                            </div>
-                          </td>
-                        )}
-                        <td className="px-3.5 py-3 font-mono text-[12.5px] text-muted">
-                          {t.dateCompleted ? shortDate(t.dateCompleted) : "—"}
-                        </td>
-                        <td className="px-3.5 py-3 font-mono text-[13.5px] font-semibold text-ink">
-                          {formatMinutes(t.minutesSpent)}
-                        </td>
-                        <td className="px-3.5 py-3"><StatusPill status={t.status} /></td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
             </div>
 
             <div className="text-[11.5px] text-faint pt-3">

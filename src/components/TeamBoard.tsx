@@ -131,107 +131,112 @@ export function TeamBoard({ meId }: { meId: string }) {
         )}
 
         <div className="bg-card border border-line rounded-[14px] overflow-hidden shadow-card">
-          <table className="w-full border-collapse">
-            <thead>
-              <tr>
-                {["Name", "Role", "Current workload", ""].map((h, i) => (
-                  <th
-                    key={i}
-                    className="bg-subtle text-left px-3.5 py-2.5 font-mono text-[10px] font-semibold tracking-[0.1em] uppercase text-faint border-b border-line whitespace-nowrap"
-                  >
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
+          {/* The card keeps overflow-hidden so its rounded corners clip cleanly,
+              which also blocks horizontal scrolling — so the table gets its own
+              scroll container. Narrow windows can now reach the last column. */}
+          <div className="overflow-x-auto scroll-quiet">
+            <table className="w-full min-w-[640px] border-collapse">
+              <thead>
                 <tr>
-                  <td colSpan={4} className="py-11 text-center text-faint text-[13.5px]">
-                    Loading…
-                  </td>
+                  {["Name", "Role", "Current workload", ""].map((h, i) => (
+                    <th
+                      key={i}
+                      className="bg-subtle text-left px-3.5 py-2.5 font-mono text-[10px] font-semibold tracking-[0.1em] uppercase text-faint border-b border-line whitespace-nowrap"
+                    >
+                      {h}
+                    </th>
+                  ))}
                 </tr>
-              ) : error ? (
-                <tr>
-                  <td colSpan={4} className="py-11 text-center text-[13.5px] text-danger-fg">
-                    {error}
-                  </td>
-                </tr>
-              ) : (
-                users.map((u) => {
-                  const n = u.openCount ?? 0;
-                  const hot = n >= peak && n > 0;
-                  return (
-                    <tr key={u.id} className="border-b border-line2 last:border-0">
-                      <td className="px-3.5 py-3 align-middle">
-                        <div className="flex items-center gap-2.5">
-                          <Avatar name={u.name} size={30} />
-                          <div>
-                            <div className="font-semibold text-[13.5px] text-ink">
-                              {u.name}
-                              {u.id === meId && (
-                                <span className="text-faint font-normal"> · you</span>
-                              )}
-                            </div>
-                            <div className="text-[11.5px] text-muted">
-                              {u.role === "manager" ? "Assigns work" : "Receives work"}
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan={4} className="py-11 text-center text-faint text-[13.5px]">
+                      Loading…
+                    </td>
+                  </tr>
+                ) : error ? (
+                  <tr>
+                    <td colSpan={4} className="py-11 text-center text-[13.5px] text-danger-fg">
+                      {error}
+                    </td>
+                  </tr>
+                ) : (
+                  users.map((u) => {
+                    const n = u.openCount ?? 0;
+                    const hot = n >= peak && n > 0;
+                    return (
+                      <tr key={u.id} className="border-b border-line2 last:border-0">
+                        <td className="px-3.5 py-3 align-middle">
+                          <div className="flex items-center gap-2.5">
+                            <Avatar name={u.name} size={30} />
+                            <div>
+                              <div className="font-semibold text-[13.5px] text-ink">
+                                {u.name}
+                                {u.id === meId && (
+                                  <span className="text-faint font-normal"> · you</span>
+                                )}
+                              </div>
+                              <div className="text-[11.5px] text-muted">
+                                {u.role === "manager" ? "Assigns work" : "Receives work"}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </td>
-                      <td className="px-3.5 py-3 align-middle">
-                        <span
-                          className={
-                            "inline-block font-mono text-[10px] font-semibold tracking-wider uppercase px-1.5 py-1 rounded " +
-                            (u.role === "manager"
-                              ? "bg-burgundy-600 text-white"
-                              : "bg-line2 text-muted")
-                          }
-                        >
-                          {u.role}
-                        </span>
-                      </td>
-                      <td className="px-3.5 py-3 align-middle">
-                        {u.role === "staff" ? (
-                          <div className="flex items-center gap-2.5 min-w-[130px]">
-                            <div className="flex-1 max-w-[96px] h-[5px] bg-line2 rounded overflow-hidden">
-                              <div
-                                className="h-full rounded transition-all"
-                                style={{
-                                  width: `${Math.round((n / peak) * 100)}%`,
-                                  background: hot ? "var(--c-brand)" : "var(--c-bar)",
-                                }}
-                              />
-                            </div>
-                            <span className="font-mono text-[12.5px] text-muted">{n} open</span>
-                          </div>
-                        ) : (
-                          <span className="text-faint font-mono text-[12.5px]">—</span>
-                        )}
-                      </td>
-                      <td className="px-3.5 py-3 align-middle text-right">
-                        {u.role === "staff" ? (
-                          <button
-                            onClick={() => remove(u)}
-                            className="font-semibold text-[12.5px] text-danger-fg border border-danger-line rounded-lg px-2.5 py-1.5 hover:bg-danger-bg"
-                          >
-                            Remove
-                          </button>
-                        ) : (
+                        </td>
+                        <td className="px-3.5 py-3 align-middle">
                           <span
-                            className="text-faint font-mono text-[12.5px]"
-                            title="Managers can't be removed from the tracker"
+                            className={
+                              "inline-block font-mono text-[10px] font-semibold tracking-wider uppercase px-1.5 py-1 rounded " +
+                              (u.role === "manager"
+                                ? "bg-burgundy-600 text-white"
+                                : "bg-line2 text-muted")
+                            }
                           >
-                            locked
+                            {u.role}
                           </span>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+                        </td>
+                        <td className="px-3.5 py-3 align-middle">
+                          {u.role === "staff" ? (
+                            <div className="flex items-center gap-2.5 min-w-[130px]">
+                              <div className="flex-1 max-w-[96px] h-[5px] bg-line2 rounded overflow-hidden">
+                                <div
+                                  className="h-full rounded transition-all"
+                                  style={{
+                                    width: `${Math.round((n / peak) * 100)}%`,
+                                    background: hot ? "var(--c-brand)" : "var(--c-bar)",
+                                  }}
+                                />
+                              </div>
+                              <span className="font-mono text-[12.5px] text-muted">{n} open</span>
+                            </div>
+                          ) : (
+                            <span className="text-faint font-mono text-[12.5px]">—</span>
+                          )}
+                        </td>
+                        <td className="px-3.5 py-3 align-middle text-right">
+                          {u.role === "staff" ? (
+                            <button
+                              onClick={() => remove(u)}
+                              className="font-semibold text-[12.5px] text-danger-fg border border-danger-line rounded-lg px-2.5 py-1.5 hover:bg-danger-bg"
+                            >
+                              Remove
+                            </button>
+                          ) : (
+                            <span
+                              className="text-faint font-mono text-[12.5px]"
+                              title="Managers can't be removed from the tracker"
+                            >
+                              locked
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
         <div className="text-[11.5px] text-faint pt-3">
           Adding someone lets them sign in and start receiving tasks. Staff can also sign up
