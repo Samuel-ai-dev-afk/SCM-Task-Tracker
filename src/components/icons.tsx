@@ -161,3 +161,13 @@ export function IconCalendarEmpty(p: IconProps) {
     </Svg>
   );
 }
+
+/** Collapse / expand the sidebar. */
+export function IconPanel(p: IconProps) {
+  return (
+    <Svg {...p}>
+      <rect x="3" y="4" width="18" height="16" rx="2.5" />
+      <path d="M9 4v16" />
+    </Svg>
+  );
+}

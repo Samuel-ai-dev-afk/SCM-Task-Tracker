@@ -192,7 +192,7 @@ export function TaskBoard({ me }: { me: Me }) {
                   </tr>
                 ) : (
                   weeks.map((w) => (
-                    <WeekGroup key={w} week={w} cols={cols}>
+                    <WeekGroup key={w} week={w} cols={cols} count={byWeek.get(w)!.length}>
                       {byWeek.get(w)!.map((t) => (
                         <TaskRow key={t.id} task={t} isManager={isManager} onClick={() => setOpenId(t.id)} />
                       ))}
@@ -243,15 +243,41 @@ function Th({ children, className = "" }: { children: React.ReactNode; className
   );
 }
 
-function WeekGroup({ week, cols, children }: { week: number; cols: number; children: React.ReactNode }) {
+/*
+  The week band is the board's organising device, and it's the one place the
+  design is allowed to be loud.
+
+  This department plans in weekly cycles and works Monday to Thursday — the
+  turnaround and buffer maths across the whole app counts Mon–Thu and nothing
+  else. So the week isn't decoration here, it's the unit the work is actually
+  measured in, and the board says so: the number set large in the display face,
+  the range in mono, a burgundy rail down the edge of each cycle.
+*/
+function WeekGroup({
+  week,
+  cols,
+  count,
+  children,
+}: {
+  week: number;
+  cols: number;
+  count: number;
+  children: React.ReactNode;
+}) {
   return (
     <>
       <tr>
-        <td colSpan={cols} className="bg-groupbar px-3.5 py-2 border-b border-line">
-          <b className="font-mono text-[10px] font-semibold tracking-[0.09em] uppercase text-ink">
-            Week {week}
-          </b>
-          <span className="text-[11.5px] text-muted ml-2.5">{weekRange(week)}</span>
+        <td colSpan={cols} className="bg-groupbar p-0 border-y border-line">
+          <div className="flex items-baseline gap-3 pl-3 pr-3.5 py-2.5 border-l-[3px] border-burgundy-600">
+            <span className="font-serif font-semibold text-[17px] leading-none text-ink">
+              Week {week}
+            </span>
+            <span className="font-mono text-[11.5px] text-muted">{weekRange(week)}</span>
+            <span className="flex-1" />
+            <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-faint">
+              {count} {count === 1 ? "task" : "tasks"}
+            </span>
+          </div>
         </td>
       </tr>
       {children}

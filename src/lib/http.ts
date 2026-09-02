@@ -15,7 +15,18 @@ export async function route<T>(fn: () => Promise<T>): Promise<Response> {
       const msg = err.errors[0]?.message ?? "Invalid input.";
       return NextResponse.json({ error: msg }, { status: 400 });
     }
-    console.error(err);
-    return NextResponse.json({ error: "Something went wrong." }, { status: 500 });
+    /*
+      Unexpected failure. The message stays generic on purpose — internal errors
+      can name tables and columns — but a short reference is generated so a
+      report of "it says something went wrong" can be matched to an exact line
+      in the server logs. Without this, a 500 here is indistinguishable from a
+      500 anywhere else in the app.
+    */
+    const ref = Math.random().toString(36).slice(2, 8).toUpperCase();
+    console.error(`[${ref}]`, err);
+    return NextResponse.json(
+      { error: `Something went wrong. Reference ${ref}.` },
+      { status: 500 }
+    );
   }
 }

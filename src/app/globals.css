@@ -11,9 +11,7 @@
 :root {
   color-scheme: light;
 
-  /* Type — all three slots currently point at Roboto. */
-  --font-serif: var(--font-sans);
-  --font-mono: var(--font-sans);
+  /* Type — three real faces, wired up in layout.tsx. */
 
   /* Surfaces */
   --c-surface: #f5f6f7;
@@ -154,6 +152,53 @@ button:disabled {
   }
 }
 
+/*
+  Collapsible sidebar.
+
+  Driven by a data attribute on <html> that the boot script sets before first
+  paint, rather than React state — otherwise the sidebar renders wide and then
+  snaps narrow on every page load. React only toggles the attribute.
+
+  Only applies from md up: on a phone the sidebar is already a horizontal strip.
+*/
+@media (min-width: 768px) {
+  .app-sidebar {
+    width: 210px;
+    transition: width 0.18s ease;
+  }
+  html[data-sidebar="collapsed"] .app-sidebar {
+    width: 66px;
+  }
+  html[data-sidebar="collapsed"] .sidebar-label {
+    display: none;
+  }
+  html[data-sidebar="collapsed"] .sidebar-row {
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  /*
+    Collapsed, the footer stacks instead of hiding: sign out and the theme
+    switch have to stay reachable in a 66px rail, only the name gives way.
+  */
+  html[data-sidebar="collapsed"] .sidebar-footer {
+    flex-direction: column;
+    gap: 6px;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  html[data-sidebar="collapsed"] .sidebar-brand {
+    padding-left: 0;
+    padding-right: 0;
+    text-align: center;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-sidebar {
+    transition: none;
+  }
+}
+
 /* Visible keyboard focus everywhere. */
 :focus-visible {
   outline: 2px solid var(--c-brand-line);
@@ -174,21 +219,25 @@ textarea:focus-visible {
 }
 
 /*
-  The "mono" role is Roboto with tabular figures rather than a monospace face.
-  Dates, hours and counts sit in columns all over this app, and proportional
-  digits make those columns wobble. The uppercase tracking is what gives labels
-  their character — the face itself never needed to change.
+  Roboto Mono carries dates, durations, counts and the uppercase labels. It is
+  already monospaced, so figures align down a column by construction; tnum is
+  kept as a belt-and-braces for the fallback face. Mono sets wider than Roboto,
+  so the letterspacing on uppercase labels is pulled back to compensate.
 */
 .font-mono {
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1;
 }
+.font-mono.uppercase {
+  letter-spacing: 0.06em;
+}
 
-/* Page titles: tight and set in the display role. */
+/* Page titles: the display voice, tightened. */
 .page-title {
+  font-family: var(--font-serif), "Roboto Serif", Georgia, serif;
   font-size: 24px;
-  font-weight: 700;
-  letter-spacing: -0.018em;
+  font-weight: 600;
+  letter-spacing: -0.012em;
   line-height: 1.15;
 }
 
@@ -199,9 +248,10 @@ textarea:focus-visible {
   rather than shouted, and they line up down a column.
 */
 .metric {
+  font-family: var(--font-mono), "Roboto Mono", ui-monospace, monospace;
   font-size: 28px;
   font-weight: 300;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
   line-height: 1.05;
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1;

@@ -62,10 +62,11 @@ const config: Config = {
       // ends in the same sans, so it degrades to something that still fits.
       fontFamily: {
         // Display: page titles and the wordmark.
-        serif: ["var(--font-sans)", "Roboto", "Helvetica Neue", "Arial", "sans-serif"],
+        serif: ["var(--font-serif)", "Roboto Serif", "Roboto Slab", "Georgia", "serif"],
+        // Body: everything conversational.
         sans: ["var(--font-sans)", "Roboto", "Helvetica Neue", "Arial", "sans-serif"],
-        // Data and labels: tabular figures, set in globals.css.
-        mono: ["var(--font-sans)", "Roboto", "Helvetica Neue", "Arial", "sans-serif"],
+        // Data and labels: dates, durations, counts, uppercase eyebrows.
+        mono: ["var(--font-mono)", "Roboto Mono", "ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
       },
       // Elevation does the work borders used to. Softer and slightly deeper
       // than before, so cards read as surfaces rather than outlined boxes.

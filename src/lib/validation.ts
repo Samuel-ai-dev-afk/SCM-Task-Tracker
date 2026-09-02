@@ -5,10 +5,26 @@ const dateStr = z
   .string()
   .regex(/^\d{4}-\d{2}-\d{2}$/, "Use a valid date (YYYY-MM-DD).");
 
+/*
+  A link the app will render in an href.
+
+  .url() alone is not enough: "javascript:alert(1)" and "data:text/html,..."
+  are both valid URLs and both execute when clicked. Since a task's file link
+  is visible to whoever opens the task — including a manager opening a staff
+  member's task — the scheme has to be pinned to http(s).
+*/
 const optionalUrl = z
   .string()
   .trim()
   .url("Enter a valid URL.")
+  .refine((v) => {
+    try {
+      const p = new URL(v).protocol;
+      return p === "http:" || p === "https:";
+    } catch {
+      return false;
+    }
+  }, "Links must start with http:// or https://.")
   .or(z.literal(""))
   .nullable()
   .optional();

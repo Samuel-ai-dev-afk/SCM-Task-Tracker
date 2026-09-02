@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { api } from "@/lib/client";
 import { joinMinutes, splitMinutes, formatMinutes } from "@/lib/time";
+import { safeHttpUrl } from "@/lib/url";
 import { STATUSES, PILLARS, CHANNELS, type Role, type Status, type Channel } from "@/lib/constants";
 import {
   weekNumber,
@@ -436,7 +437,14 @@ export function TaskModal({
                     <span className="font-mono font-semibold text-ink">
                       {formatMinutes(safeMinutes(form.hours, form.minutes))}
                     </span>
-                    . Counts toward the period this task is completed in.
+                    .{" "}
+                    {form.dateCompleted ? (
+                      <>Counts toward {form.dateCompleted.slice(0, 7)}.</>
+                    ) : (
+                      <span className="text-warn-fg font-semibold">
+                        Set a completed date below, or this time won&apos;t appear in Hours.
+                      </span>
+                    )}
                   </>
                 ) : (
                   <>Leave blank if you haven&apos;t tracked it. You can add it later.</>
@@ -500,16 +508,22 @@ export function TaskModal({
               className="w-full text-[13.5px] bg-field border border-line rounded-lg px-2.5 py-2"
             />
           </Field>
-          {form.fileLink && (
-            <a
-              href={form.fileLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-[12.5px] text-burgundy-600 font-semibold border border-line rounded-lg px-2.5 py-1.5 hover:bg-line2 mb-1"
-            >
-              ↗ Open the file
-            </a>
-          )}
+          {/* Only ever link a vetted http(s) URL — see lib/url.ts. */}
+          {form.fileLink &&
+            (safeHttpUrl(form.fileLink) ? (
+              <a
+                href={safeHttpUrl(form.fileLink) as string}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-[12.5px] text-burgundy-600 font-semibold border border-line rounded-lg px-2.5 py-1.5 hover:bg-line2 mb-1"
+              >
+                ↗ Open the file
+              </a>
+            ) : (
+              <div className="text-[12.5px] text-danger-fg bg-danger-bg rounded-lg px-2.5 py-1.5 mb-1">
+                That link can&apos;t be opened. File links must start with http:// or https://.
+              </div>
+            ))}
 
           {/* Comments */}
           {!isNew && task && (
